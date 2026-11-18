@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TMV Labs · первый экран A</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f4ef;
+    --ink: #111;
+    --muted: #6b6b66;
+    --accent: #1f8a5b;
+    --card: #fff;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: Manrope, system-ui, sans-serif; }
+  .hero { position: relative; height: 320vh; }
+  .stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+  canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .copy {
+    position: absolute; left: clamp(16px, 5vw, 72px); top: clamp(80px, 14vh, 140px);
+    max-width: min(620px, calc(100% - 32px)); pointer-events: none; z-index: 2;
+  }
+  .copy h1 { font-size: clamp(34px, 5.2vw, 76px); line-height: 1.02; letter-spacing: -0.035em; margin: 0 0 20px; font-weight: 800; }
+  .copy h1 span { color: var(--muted); }
+  .copy p { font-size: clamp(16px, 1.3vw, 19px); line-height: 1.45; color: var(--muted); margin: 0 0 28px; max-width: 470px; }
+  .cta { pointer-events: auto; display: inline-flex; align-items: center; gap: 10px; background: var(--ink); color: #fff; text-decoration: none; font-weight: 700; padding: 16px 22px; border-radius: 999px; font-size: 16px; }
+  .cta:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  .note { font-size: 13px; color: var(--muted); margin-top: 12px; }
+  .top { position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 22px clamp(16px, 5vw, 72px); z-index: 3; font-weight: 800; letter-spacing: -0.02em; }
+  .top a { color: var(--ink); text-decoration: none; font-weight: 600; font-size: 15px; }
+  .phase { position: absolute; left: clamp(16px, 5vw, 72px); bottom: 36px; z-index: 2; font-size: 14px; color: var(--muted); display: flex; gap: 18px; }
+  .phase b { color: var(--ink); font-weight: 700; }
+  .phase i { font-style: normal; opacity: .35; transition: opacity .3s; }
+  .phase i.on { opacity: 1; color: var(--ink); }
+  .tg {
+    position: absolute; right: clamp(16px, 5vw, 72px); bottom: clamp(90px, 14vh, 140px); z-index: 2;
+    width: min(360px, calc(100% - 32px)); background: var(--card); border-radius: 18px; padding: 16px 18px;
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,.18), 0 2px 6px rgba(0,0,0,.06);
+    opacity: 0; transform: translateY(30px) scale(.96); transition: opacity .5s, transform .6s cubic-bezier(.2,.8,.2,1);
+  }
+  .tg.on { opacity: 1; transform: none; }
+  .tg .h { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+  .tg .av { width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 13px; }
+  .tg .t { font-weight: 800; font-size: 17px; margin-bottom: 6px; }
+  .tg .r { font-size: 14px; line-height: 1.5; }
+  .tg .r span { color: var(--muted); }
+  .tg .ok { margin-top: 10px; font-size: 13px; color: var(--accent); font-weight: 700; }
+  .after { min-height: 60vh; display: grid; place-items: center; color: var(--muted); font-size: 18px; }
+  @media (max-width: 760px) {
+    .copy { top: 84px; }
+    .tg { bottom: 80px; }
+    .phase { display: none; }
+  }
+</style>
+</head>
+<body>
+<section class="hero" id="hero">
+  <div class="stage">
+    <canvas id="c" aria-hidden="true"></canvas>
+    <header class="top"><span>TMV Labs</span><a href="#">Кейсы</a></header>
+    <div class="copy">
+      <h1>Твой бизнес отвечает клиентам, <span>даже когда ты спишь</span></h1>
+      <p>21 год в технике, свой магазин и сервис. Сначала проверяю ботов и автоматизацию на своём бизнесе, потом внедряю тебе.</p>
+      <a class="cta" href="https://t.me/" rel="noopener">Обсудить проект в Telegram</a>
+      <div class="note">Опиши задачу за 2 минуты. Отвечу в тот же день со схемой и ценой.</div>
+    </div>
+    <div class="phase" aria-hidden="true"><b>Листай</b><i data-p="0">Сообщения отовсюду</i><i data-p="1">Бот отвечает</i><i data-p="2">Заявка у тебя</i></div>
+    <div class="tg" id="tg" role="status" aria-live="polite">
+      <div class="h"><div class="av">TL</div>Бот TMV · сейчас</div>
+      <div class="t">Новая заявка</div>
+      <div class="r"><span>Откуда:</span> Авито</div>
+      <div class="r"><span>Клиент:</span> «Есть в наличии? Заберу сегодня»</div>
+      <div class="r"><span>Бот ответил:</span> цена, наличие, адрес</div>
+      <div class="ok">Ответ ушёл ночью, ты спал</div>
+    </div>
+  </div>
+</section>
+<div class="after">Дальше идут блоки сайта</div>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const mobile = innerWidth < 760;
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, mobile ? 1.5 : 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
+camera.position.set(0, 0, 18);
+
+const light = new THREE.DirectionalLight(0xffffff, 1.4);
+light.position.set(4, 8, 10);
+scene.add(light, new THREE.AmbientLight(0xffffff, 0.5));
+
+// Каналы: цвет точки и подпись. Логотипы брендов не используем.
+const CH = [
+  { n: 'Авито', c: '#00aaff' },
+  { n: 'Telegram', c: '#2aabee' },
+  { n: 'Instagram', c: '#e1306c' },
+  { n: 'MAX', c: '#7b5cff' },
+  { n: 'Сайт', c: '#1f8a5b' },
+];
+const MSG = ['Сколько стоит?', 'Есть в наличии?', 'Запишите на субботу', 'Доставка есть?', 'Можно в рассрочку?',
+  'Во сколько работаете?', 'Пришлите прайс', 'А скидка будет?', 'Почините экран?', 'Готов мой заказ?',
+  'Сделаете сегодня?', 'Какая гарантия?', 'Где вы находитесь?', 'Есть другой цвет?'];
+
+function label(text, ch) {
+  const w = 512, h = 160, cv = document.createElement('canvas');
+  cv.width = w; cv.height = h;
+  const g = cv.getContext('2d');
+  g.fillStyle = ch.c; g.beginPath(); g.arc(46, 54, 12, 0, Math.PI * 2); g.fill();
+  g.fillStyle = '#7a7a75'; g.font = '600 30px Manrope, sans-serif'; g.fillText(ch.n, 70, 64);
+  g.fillStyle = '#111'; g.font = '700 42px Manrope, sans-serif'; g.fillText(text, 34, 122);
+  const t = new THREE.CanvasTexture(cv);
+  t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4;
+  return t;
+}
+
+const N = reduce ? 12 : (mobile ? 14 : 26);
+const W = 3.2, H = 1.0, D = 0.34;
+const boxGeo = new RoundedBoxGeometry(W, H, D, 4, 0.22);
+const planeGeo = new THREE.PlaneGeometry(W * 0.94, H * 0.94 * 0.98);
+const boxMat = new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.35, clearcoat: 1, clearcoatRoughness: 0.2 });
+
+const plates = [];
+for (let i = 0; i < N; i++) {
+  const ch = CH[i % CH.length];
+  const g = new THREE.Group();
+  g.add(new THREE.Mesh(boxGeo, boxMat));
+  const face = new THREE.Mesh(planeGeo, new THREE.MeshBasicMaterial({ map: label(MSG[i % MSG.length], ch), transparent: true }));
+  face.position.z = D / 2 + 0.002;
+  g.add(face);
+  const p = { g, pos: new THREE.Vector3((Math.random() - .5) * 8, (Math.random() - .5) * 5, (Math.random() - .5) * 3),
+    vel: new THREE.Vector3(), rot: new THREE.Vector3((Math.random() - .5) * .6, (Math.random() - .5) * .8, (Math.random() - .5) * .5),
+    spin: (Math.random() - .5) * 0.4, s: 1 };
+  plates.push(p); scene.add(g);
+}
+
+// Бот: белый блок с зелёным кольцом, появляется при прокрутке.
+const bot = new THREE.Group();
+const botCore = new THREE.Mesh(new RoundedBoxGeometry(2.2, 2.2, 2.2, 6, 0.6), new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.25, clearcoat: 1 }));
+const ringMat = new THREE.MeshStandardMaterial({ color: 0x1f8a5b, emissive: 0x1f8a5b, emissiveIntensity: 0.6 });
+const ring = new THREE.Mesh(new THREE.TorusGeometry(1.9, 0.08, 16, 80), ringMat);
+const botFace = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 0.8), new THREE.MeshBasicMaterial({ map: (() => {
+  const cv = document.createElement('canvas'); cv.width = 256; cv.height = 128; const g = cv.getContext('2d');
+  g.fillStyle = '#111'; g.font = '800 64px Manrope, sans-serif'; g.textAlign = 'center'; g.fillText('бот', 128, 84);
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return t; })(), transparent: true }));
+botFace.position.z = 1.11;
+bot.add(botCore, ring, botFace);
+scene.add(bot);
+
+// Геометрия сцены зависит от экрана: на телефоне всё ниже текста.
+let view = { w: 10, h: 6 }, swarm = new THREE.Vector3(), botPos = new THREE.Vector3(), lineDir = new THREE.Vector3(), wall = { x: -99, y: 99 };
+function resize() {
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h; camera.updateProjectionMatrix();
+  const vh = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z;
+  view = { w: vh * camera.aspect, h: vh };
+  // wall: левая (десктоп) или верхняя (телефон) граница, за которую плашки не заходят, чтобы не лезть на заголовок
+  if (w < 760) {
+    swarm.set(0, -view.h * 0.27, 0); botPos.set(view.w * 0.2, -view.h * 0.1, 0);
+    lineDir.set(-0.55, -1, 0).normalize(); wall = { x: -99, y: view.h / 2 - view.h * 0.42 };
+  } else {
+    swarm.set(view.w * 0.24, -view.h * 0.04, 0); botPos.set(view.w * 0.26, view.h * 0.1, 0);
+    lineDir.set(-0.35, -1, 0).normalize(); wall = { x: -view.w / 2 + view.w * 0.5, y: 99 };
+  }
+}
+addEventListener('resize', resize); resize();
+
+const mouse = new THREE.Vector3(999, 999, 0);
+addEventListener('pointermove', e => {
+  mouse.set((e.clientX / innerWidth - .5) * view.w, -(e.clientY / innerHeight - .5) * view.h, 0);
+});
+addEventListener('pointerleave', () => mouse.set(999, 999, 0));
+
+const hero = document.getElementById('hero');
+const tg = document.getElementById('tg');
+const steps = [...document.querySelectorAll('.phase i')];
+function progress() {
+  const r = hero.getBoundingClientRect();
+  return THREE.MathUtils.clamp(-r.top / (r.height - innerHeight), 0, 1);
+}
+const ss = (a, b, x) => THREE.MathUtils.smoothstep(x, a, b);
+
+const tmp = new THREE.Vector3(), slot = new THREE.Vector3();
+let last = performance.now(), sp = 0;
+function frame(now) {
+  const dt = Math.min((now - last) / 1000, 1 / 30); last = now;
+  const target = reduce ? 0.72 : progress();
+  sp += (target - sp) * (reduce ? 1 : 0.12);
+  const order = ss(0.08, 0.3, sp);           // насколько плашки выстроены в очередь
+  const flow = ss(0.24, 0.8, sp);           // насколько очередь ушла в бота
+  const botIn = ss(0.2, 0.34, sp);
+  const spread = mobile ? 0.8 : 1;
+
+  plates.forEach((p, i) => {
+    // 1) свободный рой: притяжение к центру, отталкивание друг от друга и от курсора
+    tmp.copy(swarm).sub(p.pos).multiplyScalar(0.9);
+    p.vel.addScaledVector(tmp, dt);
+    for (let j = i + 1; j < plates.length; j++) {
+      const q = plates[j];
+      tmp.copy(p.pos).sub(q.pos); tmp.y *= 2.2;
+      const d = tmp.length();
+      if (d < 3.4 * spread && d > 0.001) {
+        tmp.multiplyScalar((3.4 * spread - d) * 2.2 * dt / d);
+        p.vel.add(tmp); q.vel.sub(tmp);
+      }
+    }
+    tmp.copy(p.pos).sub(mouse); tmp.z = 0;
+    const md = tmp.length();
+    if (md < 3.2) p.vel.addScaledVector(tmp.normalize(), (3.2 - md) * 14 * dt);
+    const left = p.pos.x - W * 0.5 * (mobile ? 0.62 : 1), top = p.pos.y + H * 0.5;
+    if (left < wall.x) p.vel.x += (wall.x - left) * 9 * dt;
+    if (top > wall.y) p.vel.y -= (top - wall.y) * 9 * dt;
+    p.vel.multiplyScalar(0.94);
+    p.pos.addScaledVector(p.vel, dt * 2.2);
+
+    // 2) очередь: плашки по одной уходят в бота
+    const k = i / plates.length;
+    const s = k * 1.1 - flow * 1.25;         // <0 значит уже в боте
+    slot.copy(botPos).addScaledVector(lineDir, 1.8 + Math.max(s, 0) * view.h * (mobile ? 0.85 : 1.6));
+    if (s < 0) slot.copy(botPos);
+    const w = reduce ? 1 : order;
+    tmp.lerpVectors(p.pos, slot, w);
+    p.g.position.copy(tmp);
+    if (w > 0.5) p.pos.lerp(slot, 0.05);
+
+    const absorbed = THREE.MathUtils.clamp(-s * 8, 0, 1);
+    const sc = (1 - absorbed) * (1 - order * 0.35) * (mobile ? 0.62 : 1);
+    p.g.scale.setScalar(Math.max(sc, 0.0001));
+    p.g.visible = sc > 0.01;
+
+    const free = 1 - order;
+    p.g.rotation.set(
+      p.rot.x * free + p.vel.y * 0.08,
+      p.rot.y * free + Math.sin(now * 0.0004 + i) * 0.15 * free - p.vel.x * 0.05,
+      p.rot.z * free + p.spin * Math.sin(now * 0.0003 + i) * free);
+  });
+
+  bot.position.copy(botPos);
+  const doneK = ss(0.82, 0.9, sp);
+  bot.scale.setScalar(Math.max(botIn * (mobile ? 0.6 - doneK * 0.25 : 1), 0.0001));
+  if (mobile) bot.position.y += doneK * view.h * 0.03;
+  bot.rotation.y = Math.sin(now * 0.0006) * 0.35;
+  bot.rotation.x = Math.sin(now * 0.0005) * 0.15;
+  ring.rotation.set(0.25, -0.2, now * 0.001);
+  ringMat.emissiveIntensity = 0.5 + Math.sin(now * 0.008) * 0.3 * flow * (1 - ss(0.75, 0.85, sp));
+
+  const done = sp > 0.84 || reduce;
+  tg.classList.toggle('on', done);
+  steps.forEach((el, n) => el.classList.toggle('on', n === (done ? 2 : sp > 0.18 ? 1 : 0)));
+
+  renderer.render(scene, camera);
+  if (!reduce) requestAnimationFrame(frame);
+}
+if (reduce) { sp = 0.72; frame(performance.now()); addEventListener('resize', () => frame(performance.now())); }
+else requestAnimationFrame(frame);
+</script>
+</body>
+</html>
