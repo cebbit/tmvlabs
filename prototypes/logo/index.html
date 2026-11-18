@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TMV Labs · логотип, 4 варианта</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Unbounded:wght@300;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #f5f4ef; --ink: #111; --muted: #6b6b66; --accent: #1f8a5b; --accent-hi: #34c27f; --card: #fff; --line: #e6e4dc; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: Manrope, system-ui, sans-serif; }
+  main { max-width: 1180px; margin: 0 auto; padding: 40px clamp(16px, 4vw, 40px) 80px; }
+  h1 { font-size: clamp(26px, 3vw, 38px); letter-spacing: -0.03em; margin: 0 0 8px; }
+  .lead { color: var(--muted); margin: 0 0 32px; max-width: 640px; line-height: 1.5; }
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+  .v { background: var(--card); border-radius: 24px; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+  .v header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .v h2 { margin: 0; font-size: 20px; letter-spacing: -0.02em; }
+  .v h2 small { color: var(--muted); font-weight: 600; font-size: 14px; margin-left: 6px; }
+  .v p { margin: 0; color: var(--muted); line-height: 1.5; font-size: 15px; }
+  .replay { border: 0; background: var(--bg); color: var(--ink); font: 700 13px Manrope, sans-serif; padding: 10px 14px; border-radius: 999px; cursor: pointer; min-height: 40px; }
+  .replay:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .hero { display: flex; align-items: center; gap: 22px; min-height: 190px; padding: 12px 4px; cursor: pointer; }
+  .hero .mark { width: clamp(110px, 14vw, 150px); flex: none; }
+  .word { font-family: Unbounded, sans-serif; letter-spacing: -0.02em; line-height: 1; white-space: nowrap; }
+  .word b { font-weight: 700; }
+  .word span { font-weight: 300; color: var(--muted); }
+  .hero .word { font-size: clamp(26px, 3.4vw, 40px); }
+  .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch; }
+  .tile { border-radius: 14px; background: var(--bg); padding: 12px 14px; display: flex; align-items: center; gap: 10px; min-height: 56px; }
+  .tile .mark { width: 30px; }
+  .tile .word { font-size: 15px; }
+  .tile.dark { background: var(--ink); color: #fff; }
+  .tile.dark .word span { color: #a9a9a2; }
+  .tile.acc { background: var(--accent); color: #fff; }
+  .tile.acc .word span { color: #d6efe2; }
+  .fav { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 12px; }
+  .fav .m32 { width: 32px; } .fav .m16 { width: 16px; }
+  svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .note { margin-top: 28px; color: var(--muted); font-size: 14px; line-height: 1.5; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Логотип TMV Labs</h1>
+  <p class="lead">Четыре знака. Каждый живой: нажми на крупный знак, чтобы повторить анимацию. Ниже тот же знак в шапке сайта, на тёмной и зелёной плашке и в иконке вкладки 32 и 16 точек.</p>
+  <div class="grid" id="grid"></div>
+  <p class="note">Прототип для выбора. После выбора: чистые SVG-файлы знака, иконка сайта, версия для аватарки Telegram и Авито.</p>
+</main>
+<script type="module">
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const NS = 'http://www.w3.org/2000/svg';
+const wait = ms => new Promise(r => setTimeout(r, ms));
+
+// Каждый знак: svg(tone) рисует финальный кадр; play(svg) запускает анимацию и возвращает Promise.
+// tone: 'ink' для светлого фона, 'white' для тёмной и зелёной плашки.
+const C = tone => tone === 'white'
+  ? { ink: '#fff', acc: '#7fe0b0', sub: '#fff' }
+  : { ink: '#111', acc: '#1f8a5b', sub: '#fff' };
+
+const MARKS = [
+  {
+    id: 'signal', name: 'Сигнал', tag: 'развитие нынешнего знака',
+    text: 'Буквы TMV одной ломаной, как нынешний знак. По линии бежит точка (заявка), последний штрих V становится зелёной галочкой: заявка обработана.',
+    svg: t => { const c = C(t); return `<svg viewBox="-2 -4 92 60">
+      <path class="ink" d="M2 9 H30 M16 9 V50 M37 50 V12 L49.5 34 L62 12 L69 47" fill="none" stroke="${c.ink}" stroke-width="7.5" stroke-linejoin="miter" stroke-miterlimit="2.2" stroke-linecap="butt"/>
+      <path class="tick" d="M69 47 L86 4" fill="none" stroke="${c.acc}" stroke-width="7.5" stroke-linecap="butt"/>
+      <path class="route" d="M37 50 V12 L49.5 34 L62 12 L69 47 L86 4" fill="none" stroke="none"/>
+      <circle class="dot" r="4.2" fill="${c.acc}" cx="86" cy="4" opacity="0"/></svg>`; },
+    async play(s) {
+      const ink = s.querySelector('.ink'), tick = s.querySelector('.tick'), dot = s.querySelector('.dot'), route = s.querySelector('.route');
+      for (const p of [ink, tick]) { p.setAttribute('pathLength', 1); p.style.strokeDasharray = 1; }
+      tick.style.strokeDashoffset = 1;
+      await ink.animate([{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], { duration: 1100, easing: 'cubic-bezier(.6,0,.2,1)', fill: 'forwards' }).finished;
+      const L = route.getTotalLength(), t0 = performance.now(), dur = 1300;
+      dot.setAttribute('opacity', 1);
+      await new Promise(done => {
+        const f = now => {
+          const k = Math.min(1, (now - t0) / dur), e = k < .5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2;
+          const pt = route.getPointAtLength(e * L);
+          dot.setAttribute('cx', pt.x); dot.setAttribute('cy', pt.y);
+          tick.style.strokeDashoffset = Math.max(0, 1 - Math.max(0, (e * L - (L - 45.7)) / 45.7));
+          k < 1 ? requestAnimationFrame(f) : done();
+        };
+        requestAnimationFrame(f);
+      });
+      await dot.animate([{ r: 4.2, opacity: 1 }, { r: 14, opacity: 0 }], { duration: 600, easing: 'ease-out', fill: 'forwards' }).finished;
+    },
+  },
+  {
+    id: 'chat', name: 'Диалог', tag: 'бот на связи',
+    text: 'Облачко сообщения. Внутри бот «печатает» тремя точками, затем точки превращаются в зелёную галочку: клиенту ответили.',
+    svg: t => { const c = C(t), dark = t === 'white';
+      return `<svg viewBox="0 0 60 58">
+      <path class="bub" d="M18 4 H42 A14 14 0 0 1 56 18 V30 A14 14 0 0 1 42 44 H25 L12 54 L13.5 42.6 A14 14 0 0 1 4 30 V18 A14 14 0 0 1 18 4 Z" fill="${c.ink}"/>
+      <g class="dots" fill="${dark ? '#111' : '#fff'}" opacity="0"><circle cx="18" cy="24" r="4"/><circle cx="30" cy="24" r="4"/><circle cx="42" cy="24" r="4"/></g>
+      <path class="chk" d="M18.5 24.5 L26.5 32 L42 16.5" fill="none" stroke="${dark ? '#1f8a5b' : '#4fd08f'}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>`; },
+    async play(s) {
+      const bub = s.querySelector('.bub'), dots = s.querySelector('.dots'), chk = s.querySelector('.chk');
+      bub.style.transformBox = 'view-box'; bub.style.transformOrigin = '12px 54px';
+      chk.setAttribute('pathLength', 1); chk.style.strokeDasharray = 1; chk.style.strokeDashoffset = 1;
+      await bub.animate([{ transform: 'scale(.2) translateY(30px)', opacity: 0 }, { transform: 'scale(1.06)', opacity: 1, offset: .7 }, { transform: 'scale(1)', opacity: 1 }],
+        { duration: 650, easing: 'cubic-bezier(.3,1.4,.5,1)', fill: 'forwards' }).finished;
+      dots.setAttribute('opacity', 1);
+      const ds = [...dots.children];
+      const anims = ds.map((d, i) => d.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(-5px)' }, { transform: 'translateY(0)' }],
+        { duration: 520, delay: i * 130, iterations: 3, easing: 'ease-in-out' }));
+      await Promise.all(anims.map(a => a.finished));
+      await Promise.all(ds.map((d, i) => d.animate([{ opacity: 1, transform: 'scale(1)' }, { opacity: 0, transform: 'scale(.2)' }], { duration: 220, delay: i * 60, fill: 'forwards' }).finished));
+      await chk.animate([{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], { duration: 450, easing: 'cubic-bezier(.5,0,.2,1)', fill: 'forwards' }).finished;
+      dots.setAttribute('opacity', 0); ds.forEach(d => d.getAnimations().forEach(a => a.cancel()));
+    },
+  },
+  {
+    id: 'matrix', name: 'Матрица', tag: 'лаборатория, автоматика',
+    text: 'Сетка 5 на 5 точек, как табло. Точки собирают T, M, V и галочку, потом встают в спокойное T с зелёной точкой.',
+    svg: t => { const c = C(t); let h = '<svg viewBox="0 0 64 64">';
+      for (let y = 0; y < 5; y++) for (let x = 0; x < 5; x++) h += `<circle data-x="${x}" data-y="${y}" cx="${8 + x * 12}" cy="${8 + y * 12}" r="4.6" fill="${c.ink}" data-ink="${c.ink}" data-acc="${c.acc}"/>`;
+      return h + '</svg>'; },
+    frames: {
+      T: ['11111', '00100', '00100', '00100', '00100'],
+      M: ['10001', '11011', '10101', '10001', '10001'],
+      V: ['10001', '10001', '10001', '01010', '00100'],
+      ok: ['00000', '00002', '00020', '20200', '02000'],
+      rest: ['11111', '00100', '00100', '00100', '00102'],
+    },
+    paint(s, f, animate) {
+      s.querySelectorAll('circle').forEach(d => {
+        const v = this.frames[f][d.dataset.y][d.dataset.x];
+        const to = { opacity: v === '0' ? 0.09 : 1, fill: v === '2' ? d.dataset.acc : d.dataset.ink, r: v === '0' ? 3.2 : 4.6 };
+        if (!animate) { d.setAttribute('opacity', to.opacity); d.setAttribute('fill', to.fill); d.setAttribute('r', to.r); return; }
+        const delay = (+d.dataset.x + +d.dataset.y) * 28;
+        d.animate([{ opacity: d.getAttribute('opacity') ?? 1, fill: d.getAttribute('fill'), r: d.getAttribute('r') }, to], { duration: 260, delay, easing: 'ease-out', fill: 'forwards' })
+          .finished.then(a => { d.setAttribute('opacity', to.opacity); d.setAttribute('fill', to.fill); d.setAttribute('r', to.r); a.cancel(); });
+      });
+    },
+    init(s) { this.paint(s, 'rest', false); },
+    async play(s) {
+      for (const f of ['T', 'M', 'V', 'ok']) { this.paint(s, f, true); await wait(f === 'ok' ? 1000 : 640); }
+      this.paint(s, 'rest', true); await wait(500);
+    },
+  },
+  {
+    id: 'blocks', name: 'Блоки', tag: 'сборка, как во втором блоке сайта',
+    text: 'T из двух скруглённых блоков, как плашки сообщений на первом экране, и зелёный блок: новая заявка. Блоки слетаются и собираются, зелёный падает последним и мигает.',
+    svg: t => { const c = C(t); return `<svg viewBox="0 0 64 64">
+      <rect class="b1" x="5" y="6" width="42" height="14" rx="7" fill="${c.ink}"/>
+      <rect class="b2" x="19" y="23" width="14" height="36" rx="7" fill="${c.ink}"/>
+      <rect class="ring" x="38" y="39" width="20" height="20" rx="7" fill="none" stroke="${c.acc}" stroke-width="2" opacity="0"/>
+      <rect class="b3" x="38" y="39" width="20" height="20" rx="7" fill="${c.acc}"/></svg>`; },
+    async play(s) {
+      const [b1, b2, b3, ring] = ['.b1', '.b2', '.b3', '.ring'].map(q => s.querySelector(q));
+      [b1, b2, b3, ring].forEach(e => { e.style.transformBox = 'fill-box'; e.style.transformOrigin = 'center'; });
+      const spring = 'cubic-bezier(.34,1.56,.64,1)';
+      const a1 = b1.animate([{ transform: 'translate(-40px,-24px) rotate(-35deg)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 750, easing: spring, fill: 'both' });
+      const a2 = b2.animate([{ transform: 'translate(-30px,40px) rotate(28deg)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 750, delay: 120, easing: spring, fill: 'both' });
+      const a3 = b3.animate([{ transform: 'translateY(-70px) rotate(20deg)', opacity: 0 }, { transform: 'translateY(-70px) rotate(20deg)', opacity: 0, offset: .45 }, { transform: 'translateY(3px) rotate(0)', opacity: 1, offset: .82 }, { transform: 'none', opacity: 1 }],
+        { duration: 1250, easing: 'cubic-bezier(.5,0,.3,1)', fill: 'both' });
+      await Promise.all([a1.finished, a2.finished, a3.finished]);
+      ring.setAttribute('opacity', 1);
+      await ring.animate([{ transform: 'scale(1)', opacity: .9 }, { transform: 'scale(1.9)', opacity: 0 }], { duration: 700, easing: 'ease-out', fill: 'forwards' }).finished;
+      await b3.animate([{ transform: 'scale(1)' }, { transform: 'scale(.86)' }, { transform: 'scale(1)' }], { duration: 380, easing: 'ease-in-out' }).finished;
+      ring.setAttribute('opacity', 0);
+    },
+  },
+];
+
+const word = '<div class="word"><b>TMV</b> <span>Labs</span></div>';
+const grid = document.getElementById('grid');
+MARKS.forEach((m, i) => {
+  const v = document.createElement('section');
+  v.className = 'v';
+  v.innerHTML = `
+    <header><h2>${i + 1}. ${m.name}<small>${m.tag}</small></h2><button class="replay" type="button">Повторить</button></header>
+    <div class="hero" role="img" aria-label="Знак ${m.name} и надпись TMV Labs"><div class="mark big">${m.svg('ink')}</div>${word}</div>
+    <p>${m.text}</p>
+    <div class="row">
+      <div class="tile"><div class="mark">${m.svg('ink')}</div>${word}</div>
+      <div class="tile dark"><div class="mark">${m.svg('white')}</div>${word}</div>
+      <div class="tile acc"><div class="mark">${m.svg('white')}</div>${word}</div>
+      <div class="fav"><div class="mark m32">${m.svg('ink')}</div><div class="mark m16">${m.svg('ink')}</div>иконка вкладки</div>
+    </div>`;
+  grid.append(v);
+  v.querySelectorAll('.mark svg').forEach(s => m.init?.(s));
+  let busy = false;
+  // Перед каждым показом крупный знак рисуется заново, анимация идёт с чистого кадра.
+  const play = async () => {
+    if (busy || reduce) return;
+    busy = true;
+    const old = v.querySelector('.big svg');
+    const fresh = document.createRange().createContextualFragment(m.svg('ink')).firstElementChild;
+    old.replaceWith(fresh); m.init?.(fresh);
+    try { await m.play(fresh); } finally { busy = false; }
+  };
+  v.querySelector('.replay').addEventListener('click', play);
+  v.querySelector('.hero').addEventListener('click', play);
+  // Первый показ при появлении на экране, потом спокойный повтор раз в 9 секунд.
+  new IntersectionObserver(([e], o) => {
+    if (!e.isIntersecting) return;
+    o.disconnect();
+    setTimeout(play, 300 + i * 250);
+    setInterval(() => { if (!document.hidden) play(); }, 9000 + i * 700);
+  }, { threshold: .4 }).observe(v);
+});
+</script>
+</body>
+</html>
