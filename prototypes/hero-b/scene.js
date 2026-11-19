@@ -246,13 +246,13 @@ function setInst(i, pos, rx = 0, ry = 0, rz = 0, s = 1) {
   M.compose(pos, Q, SC.setScalar(Math.max(s, 0.0001)));
   shards.setMatrixAt(i, M);
 }
-const ease = t => 1 - Math.pow(1 - t, 3);
-const easeIO = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 const clamp01 = t => Math.min(Math.max(t, 0), 1);
+// перелёт с возвратом: деталь пазла чуть проскакивает место и защёлкивается
+const back = t => { const c = 1.9, u = t - 1; return 1 + (c + 1) * u * u * u + c * u * u; };
 
 // ---------- Сценарий ----------
 let t0 = 0;                         // старт сборки заголовка
-const INTRO = 2.1;                  // осколки на месте; дальше видим настоящий текст
+const INTRO = 1.5;                  // осколки на месте; дальше видим настоящий текст
 const events = [];                  // буква → плашка
 let nextEmit = 0, born = 0, introDone = false, shineAt = 0;
 
@@ -273,7 +273,7 @@ function emit(now, forceLetter) {
     const u = (k % cols + .5) / cols - .5, v = ((k / cols | 0) + .5) / rows - .5;
     tgt.set([C.x + u * W * 0.96, C.y - v * H * 0.9, C.z + D / 2], (L.start + k) * 3);
   }
-  events.push({ L, p, C, t: now });
+  events.push({ L, p, C, cols, rows, t: now });
   p.born = -2; // зарезервирована
   born++;
   L.el.classList.add('gone');
@@ -284,8 +284,8 @@ function runIntro(now) {
   const hide = clamp01((t - INTRO) / 0.35);
   for (let i = 0; i < S; i++) {
     const j = i * 3;
-    const d = 0.1 + (home[j] / view.w + .5) * 0.8 + seed[j] * 0.3;
-    const e = easeIO(clamp01((t - d) / 1.0));
+    const d = 0.05 + (home[j] / view.w + .5) * 0.6 + seed[j] * 0.2;
+    const e = back(clamp01((t - d) / 0.55));
     const sw = Math.sin(e * Math.PI) * 0.6;
     P.set(scatter[j] + (home[j] - scatter[j]) * e + Math.cos(seed[j + 1] * 6.28) * sw,
       scatter[j + 1] + (home[j + 1] - scatter[j + 1]) * e + Math.sin(seed[j + 1] * 6.28) * sw,
@@ -296,8 +296,8 @@ function runIntro(now) {
   letters.forEach(L => {
     for (let k = 0; k < L.count; k++) {
       const i = L.start + k, j = i * 3;
-      const d = 0.1 + (home[j] / view.w + .5) * 0.8 + seed[j] * 0.3;
-      const e = clamp01((t - d - 0.3) / 0.7);
+      const d = 0.05 + (home[j] / view.w + .5) * 0.6 + seed[j] * 0.2;
+      const e = clamp01((t - d - 0.15) / 0.4);
       shards.setColorAt(i, COL.copy(PEARL).lerp(L.muted ? MUTED : INK, e));
     }
   });
@@ -305,34 +305,40 @@ function runIntro(now) {
   if (t > INTRO - 0.15) h1.classList.add('ready');
   if (hide >= 1) {
     for (let i = 0; i < S; i++) setInst(i, null);
-    introDone = true; nextEmit = now + 250;
+    introDone = true; nextEmit = now + 120;
     shards.castShadow = true; // осколки в полёте к плашке отбрасывают тень
   }
 }
 
+// Плашка собирается пазлом: осколки влетают волной слева направо по ячейкам плашки,
+// каждый с перелётом и щелчком на месте, поворот доворачивается четвертями.
+const HOLD = 0.04, FLY = 0.3, SWEEP = 0.24, CLICK = 0.12;
 function runEvent(ev, now) {
   const t = (now - ev.t) / 1000, L = ev.L;
-  // 0..0.15 осколки на месте буквы; 0.15..1.35 полёт в плашку; 1.2.. плашка проявляется; 1.55 осколки гаснут
-  const fly = clamp01((t - 0.15) / 1.2), e = easeIO(fly);
-  const fade = clamp01((t - 1.3) / 0.3);
+  const fade = clamp01((t - 0.74) / 0.16);
   for (let k = 0; k < L.count; k++) {
     const i = L.start + k, j = i * 3;
-    const lag = seed[j] * 0.25, f = easeIO(clamp01((t - 0.15 - lag) / 1.0));
-    // дуга через точку перед буквой
+    const lag = HOLD + (k % ev.cols) / ev.cols * SWEEP + (k / ev.cols | 0) / ev.rows * 0.05 + seed[j] * 0.04;
+    const f = clamp01((t - lag) / FLY), pe = back(f);
     const hx = home[j], hy = home[j + 1], tx = tgt[j], ty = tgt[j + 1], tz = tgt[j + 2];
     const mx = hx + (seed[j + 1] - .5) * 1.4, my = hy + 0.6 + seed[j + 2] * 0.8, mz = 3 + seed[j] * 2.5;
-    const a = 1 - f;
-    P.set(a * a * hx + 2 * a * f * mx + f * f * tx, a * a * hy + 2 * a * f * my + f * f * ty, 2 * a * f * mz + f * f * tz);
-    const r = Math.sin(f * Math.PI) * 5;
-    setInst(i, P, seed[j] * r, seed[j + 1] * r + f * 0, seed[j + 2] * r, (1 - fade) * (1 + Math.sin(f * Math.PI) * 1.3));
-    shards.setColorAt(i, COL.copy(L.muted ? MUTED : INK).lerp(PEARL, clamp01(f * 2.2)));
+    // дуга через точку перед буквой; после места проскок по прямой к цели
+    const g = Math.min(pe, 1), a = 1 - g, over = pe - g;
+    P.set(a * a * hx + 2 * a * g * mx + g * g * tx, a * a * hy + 2 * a * g * my + g * g * ty, 2 * a * g * mz + g * g * tz - over * 0.6);
+    // щелчок: короткий толчок вглубь и раздув при посадке
+    const land = clamp01((t - lag - FLY) / CLICK), click = Math.sin(land * Math.PI);
+    P.z -= click * 0.12;
+    const q = 1 - Math.min(pe, 1);
+    const turn = ((seed[j + 2] * 4 | 0) + 1) * Math.PI / 2;
+    setInst(i, P, seed[j] * 3 * q, seed[j + 1] * 3 * q, turn * q, (1 - fade) * (1 + Math.sin(f * Math.PI) * 0.8 + click * 0.35));
+    shards.setColorAt(i, COL.copy(L.muted ? MUTED : INK).lerp(PEARL, clamp01(f * 2.5)));
   }
   shards.instanceColor.needsUpdate = true;
   const p = ev.p;
-  if (t >= 1.15 && p.born < 0) {
-    p.born = now; p.pos.copy(ev.C); p.vel.copy(swarm).sub(ev.C).setLength(2.4); p.g.visible = true;
+  if (t >= 0.7 && p.born < 0) {
+    p.born = now; p.pos.copy(ev.C); p.vel.copy(swarm).sub(ev.C).setLength(4); p.g.visible = true;
   }
-  if (t >= 1.0 && !ev.back) {
+  if (t >= 0.45 && !ev.back) {
     ev.back = true;
     L.el.classList.remove('gone');
     shine(L.el);
@@ -376,11 +382,11 @@ function frame(now) {
 
   if (!introDone && shards) { runIntro(now); shards.instanceMatrix.needsUpdate = true; }
   else if (shards) {
-    const gap = born < 6 ? 700 : 1100;
+    const gap = born < 6 ? 280 : 520;
     if (born < N && sp > 0.04) {
       // начал листать раньше, чем родились все плашки: остальные проявляются сразу в рою, без разлёта букв
       for (; born < N; born++) { const p = plates[born]; p.born = now - Math.random() * 300; p.pos.copy(swarm).add(tmp.set((Math.random() - .5) * 4, (Math.random() - .5) * 3, 0)); p.g.visible = true; }
-    } else if (born < N && now > nextEmit && events.length < 2) { emit(now); nextEmit = now + gap; }
+    } else if (born < N && now > nextEmit && events.length < 3) { emit(now); nextEmit = now + gap; }
     for (let k = events.length - 1; k >= 0; k--) if (runEvent(events[k], now)) events.splice(k, 1);
     if (born >= N && !events.length && now > shineAt) {
       // редкая волна перелива по всему заголовку
@@ -424,12 +430,12 @@ function frame(now) {
     p.g.position.copy(tmp);
     if (w > 0.5) p.pos.lerp(slot, 0.05);
 
-    const grow = reduce ? 1 : ease(clamp01(age / 0.55));
+    const grow = reduce ? 1 : back(clamp01(age / 0.32));
     const absorbed = clamp01(-s * 8);
     const sc = grow * (1 - absorbed) * (1 - order * 0.35) * (mobile ? 0.62 : 1);
     p.g.scale.set(Math.max(sc, 1e-4), Math.max(sc * (0.6 + grow * 0.4), 1e-4), Math.max(sc, 1e-4));
     p.g.visible = sc > 0.01;
-    p.faceMat.opacity = reduce ? 1 : clamp01((age - 0.2) / 0.45);
+    p.faceMat.opacity = reduce ? 1 : clamp01((age - 0.05) / 0.18);
     // плёнка переливается: толщина гуляет, у новорождённой сильнее
     const flash = 1 - clamp01(age / 1.6);
     const th = 380 + Math.sin(now * 0.0011 + p.ph) * 160 + flash * 260;
