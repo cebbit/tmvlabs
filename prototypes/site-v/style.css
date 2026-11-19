@@ -177,11 +177,12 @@ main p { margin: 0 0 12px; }
 .v1-clock circle { fill: none; stroke: var(--ink); stroke-width: 3; }
 .v1-clock line { stroke: var(--ink); stroke-width: 3.4; stroke-linecap: round; transform-origin: 24px 24px; }
 .v1-clock .v1-mm { stroke: var(--accent); stroke-width: 2.6; }
-.v1-clock b { font-family: var(--hd); font-weight: 400; font-size: 20px; font-variant-numeric: tabular-nums; }
+/* Dela Gothic: tabular-nums даёт дыру после узкой 1 («1 1:30»), поэтому цифры пропорциональные, а ширину плашки держит min-width */
+.v1-clock b { font-family: var(--hd); font-weight: 400; font-size: 20px; min-width: 3.1em; }
 .v1-hour { display: grid; grid-template-columns: minmax(180px, 3fr) minmax(0, 9fr); gap: 40px; padding: var(--sec) var(--gut) 0; position: relative; }
 .v1-hour::before { content: ''; position: absolute; left: var(--gut); right: var(--gut); top: calc(var(--sec) - 32px); height: 1px; background: var(--line); }
 .v1-stamp { position: sticky; top: 96px; align-self: start; }
-.v1-stamp time { display: block; font-family: var(--hd); font-size: clamp(44px, 6vw, 96px); line-height: .95; letter-spacing: -0.03em; color: var(--ink); font-variant-numeric: tabular-nums; }
+.v1-stamp time { display: block; font-family: var(--hd); font-size: clamp(44px, 6vw, 96px); line-height: .95; letter-spacing: -0.03em; color: var(--ink); }
 .v1-stamp p { color: var(--muted); margin-top: 12px; max-width: 22ch; font-weight: 600; }
 .v1-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
 .v1-hint { color: var(--muted); font-size: 15px; margin: -4px 0 14px; }
