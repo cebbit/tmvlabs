@@ -44,8 +44,10 @@ function split() {
   return out;
 }
 
+// шрифт заголовка задаёт CSS (переключатель ?f=0..3), здесь ждём именно его
+const hcs = getComputedStyle(h1);
 const fonts = Promise.race([
-  document.fonts ? document.fonts.load('800 60px Geologica', 'Твой бизнес') : Promise.resolve(),
+  document.fonts ? document.fonts.load(`${hcs.fontWeight} 60px ${hcs.fontFamily}`, 'Твой бизнес') : Promise.resolve(),
   new Promise(r => setTimeout(r, 1500)),
 ]);
 
@@ -64,7 +66,25 @@ const key = new THREE.DirectionalLight(0xffffff, 1.4);
 key.position.set(4, 8, 10);
 const rim = new THREE.DirectionalLight(0xdfe8ff, 0.8);
 rim.position.set(-8, -3, 6);
-scene.add(key, rim, new THREE.AmbientLight(0xffffff, 0.45));
+// тёплый отражённый свет снизу: плашки не проваливаются в серое по нижней грани
+const bounce = new THREE.DirectionalLight(0xfff0dc, 0.35);
+bounce.position.set(1, -7, 5);
+scene.add(key, rim, bounce, new THREE.AmbientLight(0xffffff, 0.4));
+
+// Мягкие тени: невидимая плоскость за плашками ловит только тень (холст прозрачный, фон страницы виден).
+// VSM даёт размытый край; радиус и смещение плоскости подобраны так, чтобы тень читалась как свет из окна сверху справа.
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.VSMShadowMap;
+key.castShadow = true;
+key.shadow.mapSize.setScalar(mobile ? 1024 : 2048);
+key.shadow.radius = mobile ? 8 : 12;
+key.shadow.blurSamples = 16;
+key.shadow.bias = -0.0004;
+key.shadow.camera.near = 1; key.shadow.camera.far = 40;
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.ShadowMaterial({ color: 0x2b2416, opacity: 0.12 }));
+ground.position.z = -1.3; // ближе к плашкам: тень прилегает, а не отлетает
+ground.receiveShadow = true;
+scene.add(ground);
 
 let view = { w: 10, h: 6 }, cw = 1, ch = 1;
 const swarm = new THREE.Vector3(), botPos = new THREE.Vector3(), lineDir = new THREE.Vector3();
@@ -75,6 +95,10 @@ function layout() {
   camera.aspect = cw / ch; camera.updateProjectionMatrix();
   const vh = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z;
   view = { w: vh * camera.aspect, h: vh };
+  // плоскость теней шире кадра (она дальше камеры), камера тени накрывает весь кадр
+  ground.scale.set(view.w * 1.4, view.h * 1.4, 1);
+  const sc = key.shadow.camera, half = Math.max(view.w, view.h) * 0.75;
+  sc.left = -half; sc.right = half; sc.top = half; sc.bottom = -half; sc.updateProjectionMatrix();
   if (cw < 760) {
     swarm.set(0, -view.h * 0.27, 0); botPos.set(view.w * 0.2, -view.h * 0.1, 0);
     lineDir.set(-0.55, -1, 0).normalize(); wall = { x: -99, y: view.h / 2 - view.h * 0.42 };
@@ -114,7 +138,9 @@ for (let i = 0; i < N; i++) {
     iridescence: 1, iridescenceIOR: 1.35, iridescenceThicknessRange: [180, 620],
   });
   const g = new THREE.Group();
-  g.add(new THREE.Mesh(boxGeo, mat));
+  const body = new THREE.Mesh(boxGeo, mat);
+  body.castShadow = true;
+  g.add(body);
   const faceMat = new THREE.MeshBasicMaterial({ map: label(MSG[i % MSG.length], CH[i % CH.length]), transparent: true, opacity: 0 });
   const face = new THREE.Mesh(planeGeo, faceMat);
   face.position.z = D / 2 + 0.002;
@@ -137,6 +163,7 @@ const botFace = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 0.8), new THREE.Mesh
   g.fillStyle = '#111'; g.font = '800 64px Manrope, sans-serif'; g.textAlign = 'center'; g.fillText('бот', 128, 84);
   const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; return t; })(), transparent: true }));
 botFace.position.z = 1.11;
+botCore.castShadow = true; ring.castShadow = true;
 bot.add(botCore, ring, botFace);
 bot.scale.setScalar(0.0001);
 scene.add(bot);
@@ -206,6 +233,8 @@ function buildShards() {
     for (let k = 0; k < L.count; k++) { shards.setColorAt(L.start + k, c); setInst(L.start + k, null); }
   });
   shards.instanceColor.setUsage(THREE.DynamicDrawUsage);
+  // во время сборки тени нет: иначе при подмене осколков текстом пропадала бы тень заголовка
+  shards.castShadow = introDone;
   scene.add(shards);
 }
 
@@ -277,6 +306,7 @@ function runIntro(now) {
   if (hide >= 1) {
     for (let i = 0; i < S; i++) setInst(i, null);
     introDone = true; nextEmit = now + 250;
+    shards.castShadow = true; // осколки в полёте к плашке отбрасывают тень
   }
 }
 

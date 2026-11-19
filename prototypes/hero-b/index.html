@@ -4,9 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>TMV Labs · плашки из букв</title>
-<script>document.documentElement.classList.add('js'); setTimeout(() => { if (!window.heroB) document.querySelector('.copy h1')?.classList.add('ready'); }, 3000);</script>
+<link rel="icon" href="../../assets/logo/favicon.svg" type="image/svg+xml">
+<script>
+  // ?f=0..3: шрифт заголовка под эффект осколков. Выбор сохраняется в адресе, переключатель внизу справа.
+  const F = Math.min(Math.max(parseInt(new URLSearchParams(location.search).get('f') ?? '0', 10) || 0, 0), 3);
+  document.documentElement.classList.add('js', 'f' + F);
+</script>
+<script> setTimeout(() => { if (!window.heroB) document.querySelector('.copy h1')?.classList.add('ready'); }, 3000);</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Geologica:wght@500..900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Geologica:wght@500..900&family=Unbounded:wght@700;800&family=Dela+Gothic+One&family=Inter+Tight:wght@800;900&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #f5f4ef;
@@ -25,9 +31,14 @@
     position: absolute; left: clamp(16px, 5vw, 72px); top: clamp(80px, 14vh, 140px);
     max-width: min(640px, calc(100% - 32px)); pointer-events: none; z-index: 2;
   }
+  /* Шрифт заголовка: плотные гротески с кириллицей. Чем плотнее штрих, тем больше осколков и сочнее разлёт. */
+  :root { --hf: Geologica; --hw: 800; --hs: 1; --hl: -0.035em; --hlh: 1.02; }
+  .f1 { --hf: Geologica; --hw: 900; --hs: 1.04; --hl: -0.05em; --hlh: .98; }
+  .f2 { --hf: Unbounded; --hw: 800; --hs: .8; --hl: -0.03em; --hlh: 1.06; }
+  .f3 { --hf: 'Dela Gothic One'; --hw: 400; --hs: .92; --hl: -0.02em; --hlh: 1.04; }
   .copy h1 {
-    font-family: Geologica, system-ui, sans-serif; font-weight: 800;
-    font-size: clamp(34px, 5.2vw, 76px); line-height: 1.02; letter-spacing: -0.035em; margin: 0 0 20px;
+    font-family: var(--hf), system-ui, sans-serif; font-weight: var(--hw);
+    font-size: calc(clamp(34px, 5.2vw, 76px) * var(--hs)); line-height: var(--hlh); letter-spacing: var(--hl); margin: 0 0 20px;
     transition: opacity .5s; pointer-events: auto; cursor: default;
   }
   .js .copy h1:not(.ready) { opacity: 0; }
@@ -70,9 +81,24 @@
   .tg .r { font-size: 14px; line-height: 1.5; }
   .tg .r span { color: var(--muted); }
   .tg .ok { margin-top: 10px; font-size: 13px; color: var(--accent); font-weight: 700; }
+  /* Плёночное зерно поверх сцены: убирает стерильность цифровой картинки. CSS, а не постобработка: холст прозрачный, текст под ним живой. */
+  .stage::after {
+    content: ''; position: absolute; inset: -50%; z-index: 5; pointer-events: none; opacity: .07; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.6 -.3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: grain 1.2s steps(6) infinite;
+  }
+  @keyframes grain { 0% { transform: translate(0,0) } 20% { transform: translate(-3%,2%) } 40% { transform: translate(2%,-4%) } 60% { transform: translate(-4%,-1%) } 80% { transform: translate(3%,3%) } 100% { transform: translate(0,0) } }
+  @media (prefers-reduced-motion: reduce) { .stage::after { animation: none; } }
+  .brand { display: inline-flex; align-items: center; gap: 10px; }
+  .brand img { width: 26px; height: 26px; display: block; }
+  .fsw { position: fixed; right: 12px; bottom: 12px; z-index: 10; display: flex; gap: 4px; align-items: center; background: rgba(255,255,255,.85); backdrop-filter: blur(8px); border-radius: 999px; padding: 4px 6px 4px 12px; font-size: 12px; color: var(--muted); box-shadow: 0 4px 14px rgba(0,0,0,.08); }
+  .fsw a { color: var(--ink); text-decoration: none; min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; white-space: nowrap; border-radius: 999px; font-weight: 700; padding: 0 10px; }
+  .fsw a[aria-current] { background: var(--ink); color: #fff; }
+  .fsw a:focus-visible { outline: 2px solid var(--accent); }
   .after { min-height: 60vh; display: grid; place-items: center; color: var(--muted); font-size: 18px; }
   @media (max-width: 760px) {
     .copy { top: 84px; }
+    .fsw span { display: none; }
     .tg { bottom: 80px; }
     .phase { display: none; }
   }
@@ -82,7 +108,7 @@
 <section class="hero" id="hero">
   <div class="stage">
     <canvas id="c" aria-hidden="true"></canvas>
-    <header class="top"><span>TMV Labs</span><a href="#">Кейсы</a></header>
+    <header class="top"><span class="brand"><img src="../../assets/logo/mark.svg" alt="">TMV Labs</span><a href="#">Кейсы</a></header>
     <div class="copy">
       <h1>Твой бизнес отвечает клиентам, <span>даже когда ты спишь</span></h1>
       <p>21 год в технике, свой магазин и сервис. Сначала проверяю ботов и автоматизацию на своём бизнесе, потом внедряю тебе.</p>
@@ -101,6 +127,10 @@
   </div>
 </section>
 <div class="after">Дальше идут блоки сайта</div>
+<nav class="fsw" aria-label="Шрифт заголовка">Шрифт
+  <a href="?f=0">1<span>&nbsp;Geologica</span></a><a href="?f=1">2<span>&nbsp;Geologica 900</span></a><a href="?f=2">3<span>&nbsp;Unbounded</span></a><a href="?f=3">4<span>&nbsp;Dela Gothic</span></a>
+</nav>
+<script>document.querySelectorAll('.fsw a')[F].setAttribute('aria-current', 'true');</script>
 
 <script type="importmap">
 { "imports": {
