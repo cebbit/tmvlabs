@@ -44,6 +44,7 @@ function tweaks() {
   const el = document.createElement('div');
   el.className = 'v-tw';
   el.innerHTML = `<div class="v-tw-panel" id="v-tw-p" hidden>
+      <fieldset class="v-tw-vars"><legend>Вариант</legend><div class="v-tw-opts">${VARIANTS.map((x, i) => `<a data-v="${i}" href="${url({ v: i })}" ${i === V ? 'aria-current="page"' : ''}>${i + 1} ${x.name}</a>`).join('')}</div></fieldset>
       <fieldset><legend>Акцент</legend><div class="v-tw-opts">${opts('a', ACC, st.a)}</div></fieldset>
       <fieldset><legend>Фон</legend><div class="v-tw-opts">${opts('g', GND, st.g)}</div></fieldset>
       <fieldset><legend>Плотность</legend><div class="v-tw-opts">${opts('d', DEN, st.d)}</div></fieldset>
@@ -52,8 +53,8 @@ function tweaks() {
         <label><input type="checkbox" name="gr" ${st.gr ? 'checked' : ''}>Зерно</label></div></fieldset>
       <p class="v-tw-hint">Всё сохраняется в адресе: ссылку можно переслать.</p>
     </div>
-    <nav class="v-tw-bar" aria-label="Вариант дизайна">${VARIANTS.map((x, i) => `<a href="${url({ v: i })}" ${i === V ? 'aria-current="page"' : ''}>${i + 1}<span class="v-tw-name">&nbsp;${x.name}</span></a>`).join('')}
-      <button type="button" aria-expanded="false" aria-controls="v-tw-p">Твики</button></nav>`;
+    <nav class="v-tw-bar" aria-label="Вариант дизайна">${VARIANTS.map((x, i) => `<a data-v="${i}" href="${url({ v: i })}" ${i === V ? 'aria-current="page"' : ''}>${i + 1}<span class="v-tw-name">&nbsp;${x.name}</span></a>`).join('')}
+      <button type="button" aria-expanded="false" aria-controls="v-tw-p"><span class="v-tw-cur">${V + 1}&nbsp;·&nbsp;</span>Твики</button></nav>`;
   document.body.append(el);
   const btn = el.querySelector('button'), panel = el.querySelector('.v-tw-panel');
   btn.addEventListener('click', () => { panel.hidden = !panel.hidden; btn.setAttribute('aria-expanded', String(!panel.hidden)); });
@@ -62,7 +63,7 @@ function tweaks() {
     const t = e.target;
     st[t.name] = t.type === 'checkbox' ? +t.checked : +t.value;
     history.replaceState(null, '', url());
-    el.querySelectorAll('.v-tw-bar a').forEach((a, i) => { a.href = url({ v: i }); });
+    el.querySelectorAll('.v-tw-bar a, .v-tw-vars a').forEach((a) => { a.href = url({ v: a.dataset.v }); });
     if (t.name === 'b2') location.reload(); // 3D-блок подключается при загрузке
     else applyTweaks();
   });
@@ -83,6 +84,7 @@ function forms() {
   }));
 }
 function sticky() {
+  if (V === 2) return; // у «Переписки» своя липкая строка ввода
   const a = document.createElement('a');
   a.className = 'v-sticky'; a.href = TG; a.rel = 'noopener'; a.textContent = fin.sticky;
   document.body.append(a);
@@ -126,8 +128,9 @@ const MOTION = [
       const t = el.dataset.time; const m = /^(\d\d):(\d\d)$/.exec(t);
       return { el, min: m ? +m[1] * 60 + +m[2] : Math.max(nowMin, 23 * 60) };
     });
-    const fin = main.querySelector('.v1-final time'); if (fin) fin.textContent = now.toTimeString().slice(0, 5);
     hours.at(-1).min = Math.max(nowMin, hours.at(-2).min + 30);
+    // Реальное время в штампе только после 22:30, иначе часы покажут 23:00, а штамп 18:40
+    const fin = main.querySelector('.v1-final time'); if (fin && hours.at(-1).min === nowMin) fin.textContent = now.toTimeString().slice(0, 5);
     // свет суток: ночь прохладнее, утро и вечер теплее; всё светлое
     const tone = (m) => { const h = m / 60; return h < 6 ? '#eef0f2' : h < 11 ? '#f7f2e8' : h < 17 ? '#f8f7f3' : '#f4ede4'; };
     const fmt = (m) => `${String(Math.floor(m / 60) % 24).padStart(2, '0')}:${String(Math.floor(m % 60)).padStart(2, '0')}`;

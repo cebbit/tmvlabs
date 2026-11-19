@@ -98,7 +98,20 @@ main p { margin: 0 0 12px; }
 .v-tw-opts label:has(input:checked) { box-shadow: inset 0 0 0 2px var(--ink); }
 .v-tw-sw { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
 .v-tw-hint { color: var(--muted); font-weight: 500; font-size: 12px; margin: 0; }
-@media (max-width: 760px) { .v-tw-name { display: none; } .v-tw { right: 8px; bottom: calc(80px + env(safe-area-inset-bottom)); } .v-sticky { display: flex; } }
+.v-tw-vars, .v-tw-cur { display: none; }
+/* Телефон: вместо полосы 1-4 одна маленькая кнопка «2 · Твики», варианты внутри панели. Полоса закрывала текст на каждом экране. */
+@media (max-width: 760px) {
+  .v-tw { right: 8px; bottom: calc(80px + env(safe-area-inset-bottom)); }
+  .v-tw-bar a { display: none; }
+  .v-tw-cur, .v-tw-vars { display: inline; }
+  .v-tw-vars { display: grid; }
+  .v-tw-vars a { padding: 8px 10px; border-radius: 10px; box-shadow: inset 0 0 0 1.5px var(--line); color: var(--ink); text-decoration: none; }
+  .v-tw-vars a[aria-current] { box-shadow: inset 0 0 0 2px var(--ink); }
+  .v-tw-panel { width: min(280px, calc(100vw - 16px)); max-height: calc(100dvh - 200px); overflow: auto; }
+  .v-sticky { display: flex; }
+  /* Переписка: своя липкая строка ввода, общая кнопка не нужна; твики над ней */
+  body[data-v="2"] .v-tw { bottom: calc(156px + env(safe-area-inset-bottom)); }
+}
 
 /* ============ 0. Схема ============ */
 .v0 { background-image: radial-gradient(circle at 1px 1px, rgba(17,17,17,.09) 1px, transparent 1.4px); background-size: 28px 28px; padding-bottom: 40px; }
@@ -205,7 +218,8 @@ main p { margin: 0 0 12px; }
 .v1-vs span { font-weight: 800; }
 .v1-vs b { font-family: var(--hd); font-weight: 400; font-size: clamp(28px, 3vw, 44px); line-height: 1.05; }
 .v1-vs small { color: var(--muted); font-size: 15px; }
-.v1-vs .v1-botc { background: var(--accent); color: #fff; }
+/* div.v1-botc: иначе .v1-vs > div:not(.v1-or) красит карточку бота в белый, текст пропадает */
+.v1-vs > div.v1-botc { background: var(--accent); color: #fff; }
 .v1-vs .v1-botc small { color: rgba(255,255,255,.82); }
 .v1-or { align-self: center; color: var(--muted); font-weight: 700; }
 .v1-prices { list-style: none; padding: 0; margin: 0; max-width: 860px; }
@@ -274,7 +288,7 @@ main p { margin: 0 0 12px; }
 #steps .v2-msg { padding-right: 46px; }
 .v2-nums { display: flex; flex-wrap: wrap; gap: 12px 32px; margin: 12px 0; }
 .v2-nums b { font-size: 40px; }
-.v2-nums span { font-size: 14px; color: var(--muted); }
+.v2-nums > div > span { font-size: 14px; color: var(--muted); }
 .v2-typing { display: none; gap: 4px; background: var(--card); border-radius: 18px; padding: 14px 16px; }
 .v2-typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); animation: v2-dot 1s infinite; }
 .v2-typing i:nth-child(2) { animation-delay: .15s; } .v2-typing i:nth-child(3) { animation-delay: .3s; }
@@ -288,7 +302,7 @@ main p { margin: 0 0 12px; }
 .anim .v2-group.seen .v2-msg, .anim .v2-group.seen .v2-replies { animation: v2-pop .42s cubic-bezier(.3,1.5,.5,1) both; animation-delay: calc(var(--k, 0) * 110ms + 380ms); }
 .anim .v2-group.typing .v2-typing { display: flex; }
 @keyframes v2-pop { from { opacity: 0; transform: translateY(14px) scale(.96); } }
-@media (max-width: 760px) { .v2 { padding: 72px 8px; } .v2-kb { grid-template-columns: 1fr; } .v2-av { width: 32px; height: 32px; } .v2-chat { border-radius: 24px; } .v2-compose { bottom: 80px; } }
+@media (max-width: 760px) { .v2-inv div { flex-direction: column; gap: 2px; } .v2 { padding: 72px 8px; } .v2-kb { grid-template-columns: 1fr; } .v2-av { width: 32px; height: 32px; } .v2-chat { border-radius: 24px; } .v2-compose { bottom: calc(12px + env(safe-area-inset-bottom)); } }
 
 /* ============ 3. Наряд-заказ ============ */
 .v3 { overflow-x: clip; padding: var(--sec) var(--gut); display: grid; gap: calc(56px * var(--d)); }
@@ -306,11 +320,13 @@ main p { margin: 0 0 12px; }
 .v3-check td:last-child { color: var(--muted); }
 .v3-check em { font-style: normal; color: var(--ink); font-weight: 600; }
 .v3-check tr td:first-child { width: 36px; padding-left: 0; }
-.v3-sub td { color: var(--ink) !important; font-weight: 700; padding-top: 28px !important; }
+/* :only-child поднимает вес над td:first-child (36px) и мобильным td:last-child (grid-column: 2) */
+.v3-check tr.v3-sub td:only-child { width: auto; grid-column: 1 / -1; padding-left: 0; color: var(--ink); font-weight: 700; padding-top: 28px; }
 .v3-box { width: 24px; height: 24px; border: 2px solid var(--ink); border-radius: 4px; display: grid; place-items: center; color: var(--accent); }
 .v3-box svg { width: 22px; height: 22px; }
 .v3-receipts { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; max-width: 860px; }
 .v3-rc { position: relative; background: var(--bg); padding: 22px 22px 30px; display: grid; gap: 2px; font-variant-numeric: tabular-nums; --zig: linear-gradient(135deg, var(--card) 6px, transparent 0) 0 100% / 12px 12px repeat-x, linear-gradient(-135deg, var(--card) 6px, transparent 0) 0 100% / 12px 12px repeat-x; background-image: var(--zig); }
+.v3-rc-bot { padding-bottom: 80px; } /* место под штамп «один раз», чтобы он не ложился на итог */
 .v3-rc > b { font-weight: 800; margin-bottom: 10px; }
 .v3-rc div { display: flex; justify-content: space-between; gap: 12px; font-size: 15px; padding: 3px 0; }
 .v3-rc div span:first-child { color: var(--muted); }
@@ -318,7 +334,7 @@ main p { margin: 0 0 12px; }
 .v3-tot span:first-child { color: var(--ink) !important; }
 .v3-cases h2 { margin-bottom: 36px; }
 .v3-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 28px; }
-.v3-order { position: relative; border: 1.5px solid var(--ink); border-radius: 6px; padding: 16px; display: grid; gap: 10px; align-content: start; }
+.v3-order { position: relative; border: 1.5px solid var(--ink); border-radius: 6px; padding: 16px 16px 72px; display: grid; gap: 10px; align-content: start; }
 .v3-order .v3-fields { margin: -16px -16px 4px; border-width: 0 0 1.5px; border-radius: 0; }
 .v3-order p small { display: block; font-size: 12px; font-weight: 800; color: var(--muted); }
 .v3-order p { margin: 0; font-size: 15px; }
