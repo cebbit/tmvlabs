@@ -100,8 +100,13 @@ function layout() {
   const sc = key.shadow.camera, half = Math.max(view.w, view.h) * 0.75;
   sc.left = -half; sc.right = half; sc.top = half; sc.bottom = -half; sc.updateProjectionMatrix();
   if (cw < 760) {
-    swarm.set(0, -view.h * 0.27, 0); botPos.set(view.w * 0.2, -view.h * 0.1, 0);
-    lineDir.set(-0.55, -1, 0).normalize(); wall = { x: -99, y: view.h / 2 - view.h * 0.42 };
+    // Телефон: рой живёт под кнопкой Telegram и подписью к ней. Граница берётся из вёрстки,
+    // а не долей экрана: высота текста зависит от ширины и шрифта.
+    const below = document.querySelector('.note') || document.querySelector('.cta');
+    const top = below ? below.getBoundingClientRect().bottom - canvas.getBoundingClientRect().top + 14 : ch * 0.42;
+    const wallY = view.h / 2 - Math.min(top, ch * 0.8) / ch * view.h;
+    swarm.set(0, (wallY - view.h / 2) / 2 - view.h * 0.03, 0); botPos.set(view.w * 0.2, -view.h * 0.1, 0);
+    lineDir.set(-0.55, -1, 0).normalize(); wall = { x: -99, y: wallY };
   } else {
     swarm.set(view.w * 0.24, -view.h * 0.04, 0); botPos.set(view.w * 0.26, view.h * 0.1, 0);
     lineDir.set(-0.35, -1, 0).normalize(); wall = { x: -view.w / 2 + view.w * 0.5, y: 99 };
@@ -412,10 +417,11 @@ function frame(now) {
     tmp.copy(p.pos).sub(mouse); tmp.z = 0;
     const md = tmp.length();
     if (md < 3.2) p.vel.addScaledVector(tmp.normalize(), (3.2 - md) * 14 * dt);
-    if (age > 1.2) {
+    // На телефоне стена включается сразу после отскока и жёстче: иначе молодые плашки висят на кнопке Telegram
+    if (age > (mobile ? 0.35 : 1.2)) {
       const left = p.pos.x - W * 0.5 * (mobile ? 0.62 : 1), top = p.pos.y + H * 0.5;
       if (left < wall.x) p.vel.x += (wall.x - left) * 9 * dt;
-      if (top > wall.y) p.vel.y -= (top - wall.y) * 9 * dt;
+      if (top > wall.y) p.vel.y -= (top - wall.y) * (mobile ? 30 : 9) * dt;
     }
     p.vel.z += -p.pos.z * 0.8 * dt;
     p.vel.multiplyScalar(0.94);
@@ -469,6 +475,7 @@ let stillUntil = 0;
 
 layout();
 await fonts;
+layout(); // шрифты меняют переносы, а с ними низ подписи под кнопкой
 // подписи плашек перерисовываем, когда Manrope точно загружен
 await Promise.race([document.fonts.load('700 42px Manrope', 'Сколько'), new Promise(r => setTimeout(r, 800))]);
 plates.forEach((p, i) => { p.faceMat.map?.dispose(); p.faceMat.map = label(MSG[i % MSG.length], CH[i % CH.length]); p.faceMat.needsUpdate = true; });
