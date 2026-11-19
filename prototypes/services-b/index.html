@@ -78,7 +78,8 @@
   .scr.active .b { opacity: 1; }
   /* С WebGL видимость каждого блока ведёт сцена: блок проявляется, когда его осколки защёлкнулись */
   .gl .b, .gl .scr.active .b { opacity: 0; transition: opacity .12s; }
-  .gl .b.on { opacity: 1; }
+  /* .scr в селекторе нужен для специфичности: иначе правило выше (4 класса) перебивает .on и блоки не видны */
+  .gl .scr .b.on { opacity: 1; }
   @media (prefers-reduced-motion: reduce) { .b, .card { transition: none; } }
 
   .after { min-height: 60vh; display: grid; place-items: center; color: var(--muted); font-size: 18px; }
