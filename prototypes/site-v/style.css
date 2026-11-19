@@ -181,6 +181,9 @@ main p { margin: 0 0 12px; }
   .v0-steps::before { left: 9px; right: auto; top: 9px; bottom: 9px; width: 2px; height: auto; }
   .v0-steps li { padding: 0 0 0 36px; }
   .v0-io p { grid-template-columns: 1fr; gap: 0; }
+  /* на 390 цена справа зажимала название до слова в строку: цена уходит под название */
+  .v0-legend tr { display: flex; flex-direction: column; gap: 4px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+  .v0-legend th, .v0-legend td { padding: 0; border: 0; text-align: left; }
 }
 
 /* ============ 1. Сутки ============ */
@@ -242,6 +245,7 @@ main p { margin: 0 0 12px; }
   .v1-stamp time { font-size: 56px; }
   .v1-cols, .v1-cases, .v1-wide, .v1-vs { grid-template-columns: 1fr; }
   .v1-or { justify-self: center; }
+  .v1-prices li { flex-direction: column; gap: 4px; }
 }
 
 /* ============ 2. Переписка ============ */
