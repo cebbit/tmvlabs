@@ -6,8 +6,8 @@
 <title>TMV Labs · плашки из букв</title>
 <link rel="icon" href="../../assets/logo/favicon.svg" type="image/svg+xml">
 <script>
-  // ?f=0..3: шрифт заголовка под эффект осколков. Выбор сохраняется в адресе, переключатель внизу справа.
-  const F = Math.min(Math.max(parseInt(new URLSearchParams(location.search).get('f') ?? '0', 10) || 0, 0), 3);
+  // ?f=0..3: шрифт заголовка под эффект осколков. По умолчанию 3 (Dela Gothic One), выбор Максима 19.11. Выбор сохраняется в адресе, переключатель внизу справа.
+  const F = Math.min(Math.max(parseInt(new URLSearchParams(location.search).get('f') ?? '3', 10) || 0, 0), 3);
   document.documentElement.classList.add('js', 'f' + F);
 </script>
 <script> setTimeout(() => { if (!window.heroB) document.querySelector('.copy h1')?.classList.add('ready'); }, 3000);</script>
