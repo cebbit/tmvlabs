@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TMV Labs · варианты сайта</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="../../assets/logo/favicon.svg" type="image/svg+xml">
+<!-- hero-b ждёт классы js и f3 (шрифт Dela Gothic One), services-b ставит gl сам -->
+<script>document.documentElement.classList.add('js', 'f3');</script>
+<link rel="preload" href="../../assets/fonts/dela-gothic-one-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../../assets/fonts/manrope-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../../assets/fonts/fonts.css">
+<link rel="stylesheet" href="./style.css">
+<script type="importmap">
+{ "imports": {
+  "three": "../../assets/vendor/three/three.module.min.js",
+  "three/addons/": "../../assets/vendor/three/addons/"
+} }
+</script>
+</head>
+<body>
+<!--
+THESIS: сайт продаёт Максима через системы, которые уже работают; после первого экрана страница сама становится образом процесса клиента, а не лентой одинаковых карточек.
+OWN-WORLD: светлый тёплый фон, тушь #111, один акцент (по умолчанию зелёный #1f8a5b), Dela Gothic One в заголовках, Manrope в тексте, плёночное зерно и перелив из hero-b. Грамматика по варианту: 1 схема с линией и узлами, 2 сутки с часами, 3 переписка в Telegram, 4 бланки сервиса со штампами.
+STORY: владелец за 20 секунд понимает, кто Максим и что это уже работает у него; видит цены «от»; пишет в Telegram.
+FIRST VIEWPORT: hero-b без изменений: заголовок из осколков слева, рой плашек справа (на телефоне под кнопкой), кнопка Telegram под подзаголовком.
+FORM: вариант 1 «Схема» стоит первым по жеребьёвке Impeccable (структура 6 из 7, ключ 60d4775a, бросок без сети); 2-4 построены по просьбе Максима показать 3-4 варианта.
+FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, and DESIGN.md
+-->
+<div id="hero-host"></div>
+<div id="svc-host"></div>
+<main id="main"></main>
+<footer class="v-foot"><span>TMV Labs · Максим, разработка для малого бизнеса</span><a href="https://t.me/" rel="noopener">Telegram</a><span>© 2026</span></footer>
+<script type="module" src="./boot.js"></script>
+</body>
+</html>
