@@ -7,7 +7,8 @@
 - Скиллы: глобально доступны `maxim-design`, `landing-architect`, `project-memory`, `navyk`, `dalshe`, `itog`; локально в проекте установлен `.claude/skills/impeccable` версии 4.0.4.
 
 ## Сейчас в работе
-- 23.11: корневой `index.html` в `redesign` перенаправляет на собранный `prototypes/site-v/`; коммит `d3274a1` запушен в `origin/redesign`. `main` и прод не трогал. Для выката нужен отдельный merge в `main` по команде Максима.
+- 23.11: корневой `index.html` в `redesign` перенаправляет на собранный `prototypes/site-v/`; коммит `d3274a1` запушен в `origin/redesign`.
+- 23.11: `redesign` слит в `main`, merge-коммит `74e66f7` запушен в `origin/main`; GitHub Pages должен обслуживать новый root entry. Проверка `https://tmvlabs.ru/` из среды дала HTTP 000, внешний DNS/Pages недоступен для проверки здесь.
 - Перенос этой сессии в новый чат: точка сохранена, следующий чат продолжает через `/dalshe`.
 
 ## Текущий статус проекта
