@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TMV Labs · экран собирается из блоков</title>
+<link rel="icon" href="../../assets/logo/favicon.svg" type="image/svg+xml">
+<script>document.documentElement.classList.add('js');</script>
+<link rel="preload" href="../../assets/fonts/dela-gothic-one-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../../assets/fonts/manrope-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../../assets/fonts/fonts.css">
+<style>
+  :root {
+    --bg: #f5f4ef;
+    --ink: #111;
+    --muted: #6b6b66;
+    --accent: #1f8a5b;
+    --card: #fff;
+    --frame: #e8e6de;
+    --soft: #dfeee6;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: Manrope, system-ui, sans-serif; }
+  .intro { min-height: 70vh; display: grid; place-items: center; text-align: center; color: var(--muted); padding: 0 16px; }
+  .intro a { color: var(--ink); font-weight: 700; }
+
+  /* Блок 2: 5 услуг, на каждую свой экран продукта. Экран собирается из блоков пазлом, при прокрутке перестраивается из тех же блоков. */
+  .svc { position: relative; height: 560vh; }
+  .stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+  canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 3; pointer-events: none; }
+
+  .side { position: absolute; left: clamp(16px, 5vw, 72px); top: clamp(56px, 12vh, 120px); width: min(460px, 40vw); z-index: 2; }
+  .side h2 { font-family: 'Dela Gothic One', system-ui, sans-serif; font-weight: 400; font-size: clamp(28px, 3.4vw, 50px); line-height: 1.05; letter-spacing: -0.02em; margin: 0 0 28px; }
+  .bar { display: flex; gap: 6px; margin-bottom: 22px; }
+  .bar i { flex: 1; height: 4px; border-radius: 4px; background: rgba(0,0,0,.1); transition: background .3s; }
+  .bar i.on { background: var(--ink); }
+  .cards { position: relative; min-height: 300px; }
+  .card { position: absolute; inset: 0 0 auto 0; opacity: 0; transform: translateY(14px); transition: opacity .25s, transform .35s cubic-bezier(.2,.8,.2,1); pointer-events: none; }
+  .card.active { opacity: 1; transform: none; pointer-events: auto; transition-delay: .08s; }
+  .card .n { font-size: 13px; font-weight: 700; color: var(--muted); letter-spacing: .04em; margin-bottom: 10px; }
+  .card h3 { font-size: clamp(20px, 1.8vw, 26px); line-height: 1.2; font-weight: 800; margin: 0 0 12px; letter-spacing: -0.01em; }
+  .card p { font-size: clamp(15px, 1.15vw, 17px); line-height: 1.5; color: var(--muted); margin: 0 0 12px; }
+  .card .works { color: var(--ink); font-size: 14px; }
+  .card .works b { font-weight: 700; }
+  .btn { display: inline-flex; align-items: center; margin-top: 8px; background: var(--ink); color: #fff; text-decoration: none; font-weight: 700; padding: 14px 20px; border-radius: 999px; font-size: 15px; position: relative; z-index: 4; }
+  .btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+  /* Рамка экрана продукта. Размер задаёт ширина, всё внутри в cqw, поэтому блоки и текст масштабируются вместе. */
+  .frame {
+    position: absolute; right: clamp(16px, 6vw, 110px); top: 50%; translate: 0 -50%;
+    width: min(520px, 42vw, calc((100svh - 120px) * 5 / 6)); aspect-ratio: 5 / 6;
+    background: var(--frame); border-radius: 4.6cqw; container-type: inline-size; z-index: 1;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 40px 80px -40px rgba(40,30,10,.25);
+  }
+  .scr { position: absolute; inset: 0; container-type: inline-size; }
+  .cap { position: absolute; left: 6%; top: -9cqw; font-size: 3.2cqw; font-weight: 700; color: var(--muted); opacity: 0; transition: opacity .3s; }
+  .scr.active .cap { opacity: 1; }
+  .b {
+    position: absolute; left: calc(var(--x) * 1%); top: calc(var(--y) * 1%); width: calc(var(--w) * 1%); height: calc(var(--h) * 1%);
+    background: var(--card); border-radius: 2.2cqw; padding: 0 3cqw; display: flex; flex-direction: column; justify-content: center; gap: .6cqw;
+    font-size: 3.3cqw; line-height: 1.3; box-shadow: 0 1.4cqw 3cqw -1.6cqw rgba(30,25,10,.28);
+    opacity: 0; transition: opacity .3s calc(var(--i, 0) * 60ms);
+  }
+  .b small { font-size: 2.5cqw; color: var(--muted); font-weight: 600; }
+  .b strong { font-weight: 800; }
+  .b.ink { background: var(--ink); color: #fff; }
+  .b.ink small { color: rgba(255,255,255,.6); }
+  .b.acc { background: var(--accent); color: #fff; }
+  .b.acc small { color: rgba(255,255,255,.75); }
+  .b.soft { background: var(--soft); }
+  .b.row { flex-direction: row; align-items: center; justify-content: space-between; }
+  .b.ctr { align-items: center; text-align: center; }
+  .b.big strong { font-size: 6cqw; line-height: 1.05; }
+  .b.bar-c { padding: 0; box-shadow: none; }
+  .chip { font-size: 2.5cqw; font-weight: 700; padding: .5cqw 1.6cqw; border-radius: 99px; background: var(--soft); color: var(--accent); white-space: nowrap; }
+  .chip.w { background: #f3e9d2; color: #8a6418; }
+  /* Без WebGL (и при reduced-motion) блоки активного экрана просто проявляются по очереди */
+  .scr.active .b { opacity: 1; }
+  /* С WebGL видимость каждого блока ведёт сцена: блок проявляется, когда его осколки защёлкнулись */
+  .gl .b, .gl .scr.active .b { opacity: 0; transition: opacity .12s; }
+  /* .scr в селекторе нужен для специфичности: иначе правило выше (4 класса) перебивает .on и блоки не видны */
+  .gl .scr .b.on { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) { .b, .card { transition: none; } }
+
+  .after { min-height: 60vh; display: grid; place-items: center; color: var(--muted); font-size: 18px; }
+  .stage::after {
+    content: ''; position: absolute; inset: -50%; z-index: 5; pointer-events: none; opacity: .07; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.6 -.3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: grain 1.2s steps(6) infinite;
+  }
+  @keyframes grain { 0% { transform: translate(0,0) } 20% { transform: translate(-3%,2%) } 40% { transform: translate(2%,-4%) } 60% { transform: translate(-4%,-1%) } 80% { transform: translate(3%,3%) } 100% { transform: translate(0,0) } }
+  @media (prefers-reduced-motion: reduce) { .stage::after { animation: none; } }
+
+  @media (max-width: 760px) {
+    .side { top: 28px; width: auto; right: 16px; }
+    .side h2 { font-size: 26px; margin-bottom: 14px; }
+    .bar { margin-bottom: 12px; }
+    .cards { min-height: 0; height: 250px; }
+    .card h3 { font-size: 18px; margin-bottom: 6px; }
+    .card p { font-size: 14px; margin-bottom: 6px; }
+    .card .works { font-size: 13px; }
+    .btn { padding: 11px 16px; font-size: 14px; margin-top: 2px; }
+    .frame { top: auto; bottom: 16px; left: 50%; right: auto; translate: -50% 0; width: min(calc(100% - 32px), calc((100svh - 400px) * 5 / 6)); }
+    .cap { top: -7.5cqw; }
+  }
+</style>
+</head>
+<body>
+<div class="intro"><p>Выше первый экран (<a href="../hero-b/">hero-b</a>). Листай вниз: второй блок.</p></div>
+
+<section class="svc" id="svc" aria-labelledby="svc-h">
+  <div class="stage">
+    <canvas id="c" aria-hidden="true"></canvas>
+    <div class="side">
+      <h2 id="svc-h">Что сделаю для твоего бизнеса</h2>
+      <div class="bar" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="cards">
+        <article class="card">
+          <div class="n">01 / 05</div>
+          <h3>Бот отвечает клиентам в Telegram, Instagram и на Авито за секунды</h3>
+          <p>Ночью тоже. Цена, наличие, запись. Сложный вопрос передаёт тебе.</p>
+          <p class="works"><b>Работает:</b> бот продаж ПроГаджет, бот по кодовому слову в Instagram, ИИ-ответы на Авито.</p>
+          <a class="btn" href="https://t.me/" rel="noopener">Хочу такого бота</a>
+        </article>
+        <article class="card">
+          <div class="n">02 / 05</div>
+          <h3>Каталог и цены всегда свежие, без ручной работы</h3>
+          <p>Бот берёт прайс поставщика, ставит твою наценку и обновляет витрину 3 раза в день. Больше не продашь в минус из-за старой цены.</p>
+          <p class="works"><b>Работает:</b> бот продаж телефонов ПроГаджет.</p>
+          <a class="btn" href="https://t.me/" rel="noopener">Автоматизировать прайс</a>
+        </article>
+        <article class="card">
+          <div class="n">03 / 05</div>
+          <h3>Порядок в заказах и кассе без потерь</h3>
+          <p>CRM под твой процесс: приём, статусы, запчасти, клиенты, деньги. Старую базу переношу.</p>
+          <p class="works"><b>Работает:</b> TMV Hub в сервисе ПроГаджет.</p>
+          <a class="btn" href="https://t.me/" rel="noopener">Посмотреть CRM</a>
+        </article>
+        <article class="card">
+          <div class="n">04 / 05</div>
+          <h3>Видно чистую прибыль, а не только выручку</h3>
+          <p>Сколько осталось после комиссий, эквайринга и расходов, по каждому каналу.</p>
+          <p class="works"><b>Работает:</b> Valyx, аналитика прибыли продавца Wildberries.</p>
+          <a class="btn" href="https://t.me/" rel="noopener">Рассчитать прибыль</a>
+        </article>
+        <article class="card">
+          <div class="n">05 / 05</div>
+          <h3>Записал видео за 15 минут, система сама опубликует везде</h3>
+          <p>Ролики выходят по расписанию в Telegram, MAX, Instagram, YouTube и ВК.</p>
+          <p class="works"><b>Работает:</b> контент-конвейер ПроГаджет.</p>
+          <a class="btn" href="https://t.me/" rel="noopener">Запустить конвейер</a>
+        </article>
+      </div>
+    </div>
+
+    <!-- Экраны продукта: числа в них показательные, для макета. Координаты блоков в процентах рамки. -->
+    <div class="frame" aria-hidden="true">
+      <div class="scr" data-s="0">
+        <div class="cap">Telegram · бот TMV</div>
+        <div class="b" style="--x:6;--y:6;--w:62;--h:13"><small>Авито · 02:14</small>Сколько стоит замена экрана на iPhone 13?</div>
+        <div class="b acc" style="--x:32;--y:22;--w:62;--h:15"><small>Бот · через 3 с</small>Оригинал 12 900 ₽, сделаем за 40 минут. Записать?</div>
+        <div class="b ctr soft" style="--x:32;--y:40;--w:19;--h:7">Сегодня</div>
+        <div class="b ctr soft" style="--x:53.5;--y:40;--w:19;--h:7">Завтра</div>
+        <div class="b ctr soft" style="--x:75;--y:40;--w:19;--h:7">Суббота</div>
+        <div class="b" style="--x:6;--y:51;--w:44;--h:9">Суббота, 12:00</div>
+        <div class="b acc" style="--x:40;--y:63;--w:54;--h:12"><small>Бот</small>Записал. Напомню за час.</div>
+        <div class="b ink row" style="--x:6;--y:82;--w:88;--h:11"><span>Сложный вопрос ушёл тебе</span><span class="chip">1</span></div>
+      </div>
+      <div class="scr" data-s="1">
+        <div class="cap">Прайс поставщика → витрина</div>
+        <div class="b soft row" style="--x:6;--y:6;--w:88;--h:9"><strong>Обновление</strong><span>09:00 · 14:00 · 19:00</span></div>
+        <div class="b row" style="--x:6;--y:19;--w:88;--h:10"><span>iPhone 15, 128 ГБ</span><strong>64 900 ₽</strong></div>
+        <div class="b row" style="--x:6;--y:31;--w:88;--h:10"><span>iPhone 14, 128 ГБ</span><strong>52 400 ₽</strong></div>
+        <div class="b row" style="--x:6;--y:43;--w:88;--h:10"><span>Galaxy S24, 256 ГБ</span><strong>58 900 ₽</strong></div>
+        <div class="b row" style="--x:6;--y:55;--w:88;--h:10"><span>AirPods Pro 2</span><strong>17 300 ₽</strong></div>
+        <div class="b acc big" style="--x:6;--y:69;--w:42;--h:15"><small>Твоя наценка</small><strong>+6%</strong></div>
+        <div class="b ink big" style="--x:52;--y:69;--w:42;--h:15"><small>Витрина</small><strong>обновлена</strong></div>
+        <div class="b soft ctr" style="--x:6;--y:87;--w:88;--h:8">Старая цена не уйдёт клиенту</div>
+      </div>
+      <div class="scr" data-s="2">
+        <div class="cap">TMV Hub · заказы сегодня</div>
+        <div class="b big" style="--x:6;--y:6;--w:27;--h:16"><small>В работе</small><strong>14</strong></div>
+        <div class="b big" style="--x:36.5;--y:6;--w:27;--h:16"><small>Готово</small><strong>6</strong></div>
+        <div class="b big" style="--x:67;--y:6;--w:27;--h:16"><small>Ждут деталь</small><strong>3</strong></div>
+        <div class="b row" style="--x:6;--y:26;--w:88;--h:10"><span>№2481 · iPhone 12, экран</span><span class="chip">Готов</span></div>
+        <div class="b row" style="--x:6;--y:38;--w:88;--h:10"><span>№2482 · MacBook Air, АКБ</span><span class="chip w">Деталь</span></div>
+        <div class="b row" style="--x:6;--y:50;--w:88;--h:10"><span>№2483 · Galaxy A54, гнездо</span><span class="chip">В работе</span></div>
+        <div class="b row" style="--x:6;--y:62;--w:88;--h:10"><span>№2484 · iPad 9, стекло</span><span class="chip">Принят</span></div>
+        <div class="b ink row" style="--x:6;--y:77;--w:88;--h:16"><span><small>Касса за день</small><br><strong>48 300 ₽</strong></span><span class="chip">сходится</span></div>
+      </div>
+      <div class="scr" data-s="3">
+        <div class="cap">Valyx · прибыль за неделю</div>
+        <div class="b big" style="--x:6;--y:6;--w:42;--h:17"><small>Выручка</small><strong>412 000 ₽</strong></div>
+        <div class="b acc big" style="--x:52;--y:6;--w:42;--h:17"><small>Чистая прибыль</small><strong>96 800 ₽</strong></div>
+        <div class="b bar-c soft" style="--x:8;--y:52;--w:9;--h:22"></div>
+        <div class="b bar-c soft" style="--x:20.5;--y:44;--w:9;--h:30"></div>
+        <div class="b bar-c soft" style="--x:33;--y:48;--w:9;--h:26"></div>
+        <div class="b bar-c acc" style="--x:45.5;--y:36;--w:9;--h:38"></div>
+        <div class="b bar-c soft" style="--x:58;--y:42;--w:9;--h:32"></div>
+        <div class="b bar-c acc" style="--x:70.5;--y:30;--w:9;--h:44"></div>
+        <div class="b bar-c acc" style="--x:83;--y:27;--w:9;--h:47"></div>
+        <div class="b row" style="--x:6;--y:80;--w:88;--h:13"><span>Комиссии, эквайринг, логистика</span><strong>−315 200 ₽</strong></div>
+      </div>
+      <div class="scr" data-s="4">
+        <div class="cap">Контент-конвейер</div>
+        <div class="b ink ctr" style="--x:6;--y:6;--w:42;--h:42"><small>Записал</small><strong style="font-size:7cqw">15 мин</strong><small>один ролик</small></div>
+        <div class="b row" style="--x:52;--y:6;--w:42;--h:7.4"><span>Telegram</span><span class="chip">18:00</span></div>
+        <div class="b row" style="--x:52;--y:15.6;--w:42;--h:7.4"><span>MAX</span><span class="chip">18:00</span></div>
+        <div class="b row" style="--x:52;--y:25.2;--w:42;--h:7.4"><span>Instagram</span><span class="chip">18:05</span></div>
+        <div class="b row" style="--x:52;--y:34.8;--w:42;--h:7.4"><span>YouTube</span><span class="chip">18:10</span></div>
+        <div class="b row" style="--x:52;--y:44.4;--w:42;--h:7.4"><span>ВК</span><span class="chip">18:10</span></div>
+        <div class="b soft row" style="--x:6;--y:58;--w:88;--h:14"><span><small>Расписание</small><br><strong>каждый день в 18:00</strong></span><span class="chip">5 площадок</span></div>
+        <div class="b acc ctr" style="--x:6;--y:78;--w:88;--h:15"><strong>Ты снимаешь, система публикует</strong></div>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="after">Дальше идут блоки сайта</div>
+
+<script src="./ui.js"></script>
+<script type="importmap">
+{ "imports": {
+  "three": "../../assets/vendor/three/three.module.min.js",
+  "three/addons/": "../../assets/vendor/three/addons/"
+} }
+</script>
+<script type="module" src="./scene.js"></script>
+</body>
+</html>

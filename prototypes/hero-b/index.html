@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TMV Labs · плашки из букв</title>
+<link rel="icon" href="../../assets/logo/favicon.svg" type="image/svg+xml">
+<script>
+  // ?f=0..3: шрифт заголовка под эффект осколков. По умолчанию 3 (Dela Gothic One), выбор Максима 19.11. Выбор сохраняется в адресе, переключатель внизу справа.
+  const F = Math.min(Math.max(parseInt(new URLSearchParams(location.search).get('f') ?? '3', 10) || 0, 0), 3);
+  document.documentElement.classList.add('js', 'f' + F);
+</script>
+<script> setTimeout(() => { if (!window.heroB) document.querySelector('.copy h1')?.classList.add('ready'); }, 3000);</script>
+<!-- Dela Gothic One и Manrope свои (assets/fonts). Google Fonts грузится только для старых вариантов ?f=0..2. -->
+<link rel="preload" href="../../assets/fonts/dela-gothic-one-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../../assets/fonts/manrope-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../../assets/fonts/fonts.css">
+<script>
+  if (F !== 3) document.write('<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geologica:wght@500..900&family=Unbounded:wght@700;800&display=swap">');
+</script>
+<style>
+  :root {
+    --bg: #f5f4ef;
+    --ink: #111;
+    --muted: #6b6b66;
+    --accent: #1f8a5b;
+    --card: #fff;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: Manrope, system-ui, sans-serif; }
+  .hero { position: relative; height: 320vh; }
+  .stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+  /* Холст поверх текста: осколки букв вылетают из заголовка к зрителю */
+  canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 3; pointer-events: none; }
+  .copy {
+    position: absolute; left: clamp(16px, 5vw, 72px); top: clamp(80px, 14vh, 140px);
+    max-width: min(640px, calc(100% - 32px)); pointer-events: none; z-index: 2;
+  }
+  /* Шрифт заголовка: плотные гротески с кириллицей. Чем плотнее штрих, тем больше осколков и сочнее разлёт. */
+  :root { --hf: Geologica; --hw: 800; --hs: 1; --hl: -0.035em; --hlh: 1.02; }
+  .f1 { --hf: Geologica; --hw: 900; --hs: 1.04; --hl: -0.05em; --hlh: .98; }
+  .f2 { --hf: Unbounded; --hw: 800; --hs: .8; --hl: -0.03em; --hlh: 1.06; }
+  .f3 { --hf: 'Dela Gothic One'; --hw: 400; --hs: .92; --hl: -0.02em; --hlh: 1.04; }
+  .copy h1 {
+    font-family: var(--hf), system-ui, sans-serif; font-weight: var(--hw);
+    font-size: calc(clamp(34px, 5.2vw, 76px) * var(--hs)); line-height: var(--hlh); letter-spacing: var(--hl); margin: 0 0 20px;
+    transition: opacity .5s; pointer-events: auto; cursor: default;
+  }
+  .js .copy h1:not(.ready) { opacity: 0; }
+  .copy h1 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .copy h1 > span { color: var(--muted); }
+  .copy h1 .g { --c: var(--ink); color: var(--c); }
+  .copy h1 .g.muted { --c: var(--muted); }
+  .copy h1 .w { display: inline-block; white-space: nowrap; }
+  .copy h1 .l { display: inline-block; transition: opacity .28s, transform .5s cubic-bezier(.2,.8,.2,1); }
+  /* Буква отдала осколки в плашку */
+  .copy h1 .l.gone { opacity: 0; transform: translateY(-.04em) scale(.96); transition: opacity .12s, transform .3s; }
+  /* Перелив: тонкая плёнка, как на плашках */
+  .copy h1 .l.shine {
+    background: linear-gradient(105deg, var(--c) 0%, var(--c) 32%, #6fd3ff 42%, #b59bff 50%, #ffb7d5 57%, #ffe08a 63%, var(--c) 74%, var(--c) 100%);
+    background-size: 320% 100%; background-position: 100% 0;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: shine 1.3s cubic-bezier(.3,.6,.3,1) both;
+  }
+  @keyframes shine { to { background-position: 0 0; } }
+  .copy p { font-size: clamp(16px, 1.3vw, 19px); line-height: 1.45; color: var(--muted); margin: 0 0 28px; max-width: 470px; }
+  .cta { pointer-events: auto; display: inline-flex; align-items: center; gap: 10px; background: var(--ink); color: #fff; text-decoration: none; font-weight: 700; padding: 16px 22px; border-radius: 999px; font-size: 16px; position: relative; z-index: 4; }
+  .cta:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  .note { font-size: 13px; color: var(--muted); margin-top: 12px; }
+  .top { position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: 22px clamp(16px, 5vw, 72px); z-index: 4; font-weight: 800; letter-spacing: -0.02em; }
+  .top a { color: var(--ink); text-decoration: none; font-weight: 600; font-size: 15px; }
+  .phase { position: absolute; left: clamp(16px, 5vw, 72px); bottom: 36px; z-index: 2; font-size: 14px; color: var(--muted); display: flex; gap: 18px; }
+  .phase b { color: var(--ink); font-weight: 700; }
+  .phase i { font-style: normal; opacity: .35; transition: opacity .3s; }
+  .phase i.on { opacity: 1; color: var(--ink); }
+  .tg {
+    position: absolute; right: clamp(16px, 5vw, 72px); bottom: clamp(90px, 14vh, 140px); z-index: 4;
+    width: min(360px, calc(100% - 32px)); background: var(--card); border-radius: 18px; padding: 16px 18px;
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,.18), 0 2px 6px rgba(0,0,0,.06);
+    opacity: 0; transform: translateY(30px) scale(.96); transition: opacity .5s, transform .6s cubic-bezier(.2,.8,.2,1);
+  }
+  .tg.on { opacity: 1; transform: none; }
+  .tg .h { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+  .tg .av { width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 13px; }
+  .tg .t { font-weight: 800; font-size: 17px; margin-bottom: 6px; }
+  .tg .r { font-size: 14px; line-height: 1.5; }
+  .tg .r span { color: var(--muted); }
+  .tg .ok { margin-top: 10px; font-size: 13px; color: var(--accent); font-weight: 700; }
+  /* Плёночное зерно поверх сцены: убирает стерильность цифровой картинки. CSS, а не постобработка: холст прозрачный, текст под ним живой. */
+  .stage::after {
+    content: ''; position: absolute; inset: -50%; z-index: 5; pointer-events: none; opacity: .07; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1.6 -.3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: grain 1.2s steps(6) infinite;
+  }
+  @keyframes grain { 0% { transform: translate(0,0) } 20% { transform: translate(-3%,2%) } 40% { transform: translate(2%,-4%) } 60% { transform: translate(-4%,-1%) } 80% { transform: translate(3%,3%) } 100% { transform: translate(0,0) } }
+  @media (prefers-reduced-motion: reduce) { .stage::after { animation: none; } }
+  .brand { display: inline-flex; align-items: center; gap: 10px; }
+  .brand img { width: 26px; height: 26px; display: block; }
+  .fsw { position: fixed; right: 12px; bottom: 12px; z-index: 10; display: flex; gap: 4px; align-items: center; background: rgba(255,255,255,.85); backdrop-filter: blur(8px); border-radius: 999px; padding: 4px 6px 4px 12px; font-size: 12px; color: var(--muted); box-shadow: 0 4px 14px rgba(0,0,0,.08); }
+  .fsw a { color: var(--ink); text-decoration: none; min-width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; white-space: nowrap; border-radius: 999px; font-weight: 700; padding: 0 10px; }
+  .fsw a[aria-current] { background: var(--ink); color: #fff; }
+  .fsw a:focus-visible { outline: 2px solid var(--accent); }
+  .after { min-height: 60vh; display: grid; place-items: center; color: var(--muted); font-size: 18px; }
+  @media (max-width: 760px) {
+    .copy { top: 84px; }
+    .fsw span { display: none; }
+    .tg { bottom: 80px; }
+    .phase { display: none; }
+  }
+</style>
+</head>
+<body>
+<section class="hero" id="hero">
+  <div class="stage">
+    <canvas id="c" aria-hidden="true"></canvas>
+    <header class="top"><span class="brand"><img src="../../assets/logo/mark.svg" alt="">TMV Labs</span><a href="#">Кейсы</a></header>
+    <div class="copy">
+      <h1>Твой бизнес отвечает клиентам, <span>даже когда ты спишь</span></h1>
+      <p>21 год в технике, свой магазин и сервис. Сначала проверяю ботов и автоматизацию на своём бизнесе, потом внедряю тебе.</p>
+      <a class="cta" href="https://t.me/" rel="noopener">Обсудить проект в Telegram</a>
+      <div class="note">Опиши задачу за 2 минуты. Отвечу в тот же день со схемой и ценой.</div>
+    </div>
+    <div class="phase" aria-hidden="true"><b>Листай</b><i data-p="0">Сообщения отовсюду</i><i data-p="1">Бот отвечает</i><i data-p="2">Заявка у тебя</i></div>
+    <div class="tg" id="tg" role="status" aria-live="polite">
+      <div class="h"><div class="av">TL</div>Бот TMV · сейчас</div>
+      <div class="t">Новая заявка</div>
+      <div class="r"><span>Откуда:</span> Авито</div>
+      <div class="r"><span>Клиент:</span> «Есть в наличии? Заберу сегодня»</div>
+      <div class="r"><span>Бот ответил:</span> цена, наличие, адрес</div>
+      <div class="ok">Ответ ушёл ночью, ты спал</div>
+    </div>
+  </div>
+</section>
+<div class="after">Дальше идут блоки сайта</div>
+<nav class="fsw" aria-label="Шрифт заголовка">Шрифт
+  <a href="?f=0">1<span>&nbsp;Geologica</span></a><a href="?f=1">2<span>&nbsp;Geologica 900</span></a><a href="?f=2">3<span>&nbsp;Unbounded</span></a><a href="?f=3">4<span>&nbsp;Dela Gothic</span></a>
+</nav>
+<script>document.querySelectorAll('.fsw a')[F].setAttribute('aria-current', 'true');</script>
+
+<script type="importmap">
+{ "imports": {
+  "three": "../../assets/vendor/three/three.module.min.js",
+  "three/addons/": "../../assets/vendor/three/addons/"
+} }
+</script>
+<script type="module" src="./scene.js"></script>
+</body>
+</html>

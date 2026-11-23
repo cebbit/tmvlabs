@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TMV Labs · знак из осколков</title>
+<link rel="icon" href="../../assets/logo/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Geologica:wght@800&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #f5f4ef; --ink: #111; --muted: #6b6b66; --line: #e4e2da; --accent: #1f8a5b; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: Manrope, system-ui, sans-serif; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-family: Geologica, sans-serif; font-weight: 800; font-size: clamp(26px, 3.4vw, 40px); letter-spacing: -0.03em; margin: 0 0 8px; }
+  .lead { color: var(--muted); margin: 0 0 24px; max-width: 640px; line-height: 1.5; }
+  .stage { position: relative; height: min(62vh, 560px); border-radius: 24px; background: #efede6; overflow: hidden; }
+  .stage canvas { width: 100%; height: 100%; display: block; }
+  .tabs { position: absolute; left: 16px; bottom: 16px; display: flex; gap: 6px; }
+  .tabs button { font: 700 14px Manrope, sans-serif; border: 0; border-radius: 999px; padding: 10px 16px; background: rgba(255,255,255,.8); color: var(--ink); cursor: pointer; }
+  .tabs button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+  .tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .hint { position: absolute; right: 16px; bottom: 22px; font-size: 13px; color: var(--muted); }
+  h2 { font-size: 18px; margin: 40px 0 14px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .card { border: 1px solid var(--line); border-radius: 18px; padding: 20px; min-height: 150px; display: flex; flex-direction: column; justify-content: space-between; gap: 16px; background: #fff; }
+  .card.dark { background: #111; color: #fff; border-color: #111; }
+  .card small { color: var(--muted); font-size: 13px; }
+  .card.dark small { color: #9a9a94; }
+  .lock { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 22px; letter-spacing: -0.02em; }
+  .lock img { width: 34px; height: 34px; }
+  .fav { display: flex; align-items: end; gap: 14px; }
+  .tab { white-space: nowrap; display: flex; align-items: center; gap: 8px; background: #e9e7e0; border-radius: 10px 10px 0 0; padding: 8px 12px; font-size: 13px; width: max-content; }
+  .tab.dark { background: #2b2b2b; color: #ddd; }
+  .tab img { width: 16px; height: 16px; }
+  .avatar { width: 72px; height: 72px; border-radius: 50%; background: #111; display: grid; place-items: center; }
+  .avatar img { width: 44px; }
+  ul { color: var(--muted); line-height: 1.6; padding-left: 20px; }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>Знак из тех же осколков</h1>
+  <p class="lead">Знак и первый экран теперь одна система: буква Т собрана из плиток, как заголовок, а одна плитка вырвалась и стала перламутровой плашкой сообщения. Это и есть суть TMV Labs: из бизнеса выходит ответ клиенту.</p>
+  <div class="stage">
+    <canvas id="c" aria-label="Знак TMV Labs собирается из плиток"></canvas>
+    <div class="tabs" role="group" aria-label="Что показать">
+      <button type="button" data-m="mark" aria-pressed="true">Знак Т</button>
+      <button type="button" data-m="word" aria-pressed="false">Слово TMV</button>
+    </div>
+    <div class="hint">Наведи мышь</div>
+  </div>
+
+  <h2>Как знак живёт на носителях</h2>
+  <div class="grid">
+    <div class="card"><div class="lock"><img src="../../assets/logo/mark.svg" alt="">TMV Labs</div><small>Шапка сайта, светлый фон</small></div>
+    <div class="card dark"><div class="lock"><img src="../../assets/logo/mark-light.svg" alt="">TMV Labs</div><small>Тёмный фон, подвал, презентации</small></div>
+    <div class="card"><div class="fav"><div class="tab"><img src="../../assets/logo/favicon.svg" alt="">TMV Labs</div><div class="tab dark"><img src="../../assets/logo/favicon.svg" alt="">TMV Labs</div></div><small>Вкладка браузера 16 px, светлая и тёмная</small></div>
+    <div class="card"><div class="avatar"><img src="../../assets/logo/mark-light.svg" alt=""></div><small>Аватар Telegram и Авито</small></div>
+    <div class="card" style="grid-column: 1 / -1"><img src="../../assets/logo/wordmark-tmv.svg" alt="TMV" style="height: 64px; width: auto; align-self: start"><small>Слово TMV из плиток, для обложек и крупных размеров</small></div>
+  </div>
+  <h2>Файлы</h2>
+  <ul>
+    <li><code>assets/logo/mark.svg</code>, <code>mark-light.svg</code>: знак для светлого и тёмного фона</li>
+    <li><code>assets/logo/favicon.svg</code>: знак на тёмной плашке, читается и на светлой, и на тёмной вкладке</li>
+    <li><code>assets/logo/wordmark-tmv.svg</code>: слово TMV из плиток</li>
+  </ul>
+</main>
+<script type="importmap">
+{ "imports": { "three": "../../assets/vendor/three/three.module.min.js", "three/addons/": "../../assets/vendor/three/addons/" } }
+</script>
+<script type="module" src="./logo.js"></script>
+</body>
+</html>
