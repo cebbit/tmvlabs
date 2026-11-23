@@ -1,6 +1,8 @@
 # STATE — tmvlabs.ru (сайт TMV Labs)
 Обновлено: 23.11.2026
 
+- 23.11: починен локальный preview launcher: `npx serve` больше не получает жёсткий `-l 8765`, поэтому Claude Desktop может назначать свободный порт без пустой страницы и `ERR_CONNECTION_REFUSED`. Проверено через preview на desktop/mobile; hero, CTA и плашки отображаются, ошибок JavaScript нет.
+
 ## Текущий статус
 - Живой сайт: одна выгрузка из конструктора, файл `index.html` весит 2 МБ, картинки внутри в base64. Отдаёт GitHub Pages из main, домен tmvlabs.ru. Push в main сразу меняет сайт.
 - Редизайн в ветке `redesign`; ветка синхронна с `origin/redesign` на коммите `a25c064`. Intent согласован (`docs/intent/2026-11-18-redesign.md`).

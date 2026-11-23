@@ -4,7 +4,7 @@
     {
       "name": "tmvlabs-preview",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["--yes", "serve", ".", "-l", "8765"],
+      "runtimeArgs": ["--yes", "serve", "."],
       "port": 8765
     }
   ]
