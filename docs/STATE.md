@@ -1,7 +1,7 @@
 # STATE — tmvlabs.ru (сайт TMV Labs)
 Обновлено: 23.11.2026
 
-- 23.11: первый UX/UI-проход в `prototypes/site-v/style.css`: общий hover/active/focus для CTA, безопасная зона 44px, mobile safe-area, clip горизонтального переполнения, выравнивание hero/services и footer. Проверено preview на desktop/mobile; JS ошибок и горизонтального скролла нет. Следом — показать и подтачивать палитру/ритм по вкусу.
+- 23.11: первый UX/UI-проход в `prototypes/site-v/style.css`: общий hover/active/focus для CTA, безопасная зона 44px, mobile safe-area, clip горизонтального переполнения, выравнивание hero/services и footer. Повторно проверено preview на desktop/mobile: hero, services и CTA отображаются, JS ошибок и горизонтального скролла нет. Следом — подтачивать палитру/ритм по вкусу.
 
 - 23.11: починен локальный preview launcher: `npx serve` больше не получает жёсткий `-l 8765`, поэтому Claude Desktop может назначать свободный порт без пустой страницы и `ERR_CONNECTION_REFUSED`. Проверено через preview на desktop/mobile; hero, CTA и плашки отображаются, ошибок JavaScript нет.
 
