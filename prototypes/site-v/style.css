@@ -403,3 +403,24 @@ main p { margin: 0 0 12px; }
   .s-screen *, .v0-track i, .v2-msg, .v2-replies, .v3-stamp { animation: none !important; opacity: 1 !important; transform: none !important; scale: 1 !important; }
   .v-btn, .v-pin, .v-sticky { transition: none; }
 }
+
+/* Первый проход полировки: общий ритм действий и безопасные зоны касания. */
+body { overflow-x: clip; }
+.v-btn, .cta, .btn { transition: transform .22s cubic-bezier(.2,.8,.2,1), background-color .2s, box-shadow .2s; }
+.v-btn:hover, .cta:hover, .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 24px -14px rgba(17,17,17,.55); }
+.v-btn:active, .cta:active, .btn:active { transform: translateY(0) scale(.98); }
+.v-form input, .v-form textarea { box-sizing: border-box; }
+#hero .top a, #hero .cta, #svc .btn { min-height: 44px; }
+#hero .top a { display: inline-flex; align-items: center; }
+#hero .copy p { max-width: 48ch; }
+#hero .note { max-width: 42ch; line-height: 1.4; }
+#svc .side { max-width: 460px; }
+#svc .card .works { line-height: 1.45; }
+
+@media (max-width: 760px) {
+  #hero .top { padding-top: max(16px, env(safe-area-inset-top)); }
+  #hero .copy { top: clamp(72px, 11vh, 96px); }
+  #hero .copy p { max-width: 34ch; }
+  #svc .side { top: max(24px, env(safe-area-inset-top)); }
+  .v-foot { padding-bottom: 132px; }
+}
