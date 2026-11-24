@@ -215,7 +215,9 @@ function buildShards() {
   if (shards) { scene.remove(shards); shards.geometry.dispose(); }
   const { pts, step } = sample();
   S = pts.length / 2;
+  if (!S || !cw || !ch || !Number.isFinite(view.w) || !Number.isFinite(view.h)) return;
   const size = step * view.w / cw * 0.92;
+  if (!Number.isFinite(size) || size <= 0) return;
   const geo = new THREE.BoxGeometry(size, size, size * 0.5);
   const mat = new THREE.MeshPhysicalMaterial({
     color: 0xffffff, roughness: 0.18, metalness: 0.55, clearcoat: 1,
