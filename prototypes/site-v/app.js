@@ -3,6 +3,19 @@ import { TG, bots, math, cases, tools, prices, seo, steps, trust, fin } from './
 const esc = (v) =>
   String(v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+/* ---------- Animated Mini Bot Mascot SVG ---------- */
+const BOT_MASCOT = `
+<svg viewBox="0 0 28 28" fill="none" aria-hidden="true">
+  <g class="bot-antenna">
+    <line x1="14" y1="3" x2="14" y2="7" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="14" cy="2.6" r="1.8" fill="#bfdbfe"/>
+  </g>
+  <rect x="4" y="7" width="20" height="15" rx="6" fill="#fff" fill-opacity="0.18" stroke="#fff" stroke-width="1.8"/>
+  <circle class="bot-eye" cx="10.5" cy="14.5" r="1.9" fill="#fff"/>
+  <circle class="bot-eye" cx="17.5" cy="14.5" r="1.9" fill="#fff"/>
+  <path d="M11.2 18.2c1.5 1 4.1 1 5.6 0" stroke="#bfdbfe" stroke-width="1.6" stroke-linecap="round"/>
+</svg>`;
+
 /* ---------- Crisp SVG symbols (Clerk-style hover glow) ---------- */
 const SVG = {
   chat: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>',
@@ -22,15 +35,22 @@ const SVG = {
   swap: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>',
 };
 
-const botLiveIcons = [SVG.bolt, SVG.chat, SVG.box, SVG.bell, SVG.check, SVG.cam];
-const botMarketIcons = [SVG.cal, SVG.sliders, SVG.tag, SVG.star, SVG.send];
-const toolIcons = [SVG.mic, SVG.swap, SVG.cam];
+/* ---------- Ticker items (Ramp style) ---------- */
+const tickerItems = [
+  ['ИИ-бот', 'Авито отвечает клиентам 24/7'],
+  ['Автопрайс', 'Обновление витрины 3 раза в день'],
+  ['TMV Hub', 'Заказы, склад и касса сервиса'],
+  ['Valyx', 'Чистая прибыль Wildberries'],
+  ['Пульс', 'Согласование задач 1 кнопкой'],
+  ['Content Hub', 'Автопубликация в 5 площадок'],
+  ['SEO', 'Статьи под запросы в Яндексе'],
+];
 
 /* ---------- Interactive Showcase Data (Clerk style) ---------- */
 const liveTabs = [
   {
     num: '01',
-    label: 'Боты 24/7',
+    label: 'ИИ-боты 24/7',
     title: 'Бот отвечает клиенту за секунды, даже в 03:12 ночи',
     text: 'Принимает вопросы с Авито, Telegram и сайта, проверяет наличие и цену, а готовую заявку сразу присылает тебе в Telegram.',
     works: 'Авито и бот памяток ПроГаджет',
@@ -49,7 +69,7 @@ const liveTabs = [
     text: 'Бот забирает прайс поставщика, применяет твою наценку и обновляет витрину 3 раза в день. Старая цена больше не уходит клиенту.',
     works: 'бот продаж телефонов ПроГаджет',
     screenTitle: 'Прайс поставщика → витрина',
-    status: 'Обновление 09:00 · 14:00 · 19:00',
+    status: '09:00 · 14:00 · 19:00',
     rows: [
       { left: 'iPhone 15, 128 ГБ', sub: 'Наценка применена автоматически', right: 'Обновлено' },
       { left: 'Galaxy S24, 256 ГБ', sub: 'Сверено с сайтом и Авито', right: 'Обновлено' },
@@ -104,22 +124,62 @@ const mapOutputs = [
   { id: 3, label: 'Утренняя сводка', icon: SVG.check },
 ];
 
-const cardList = (items, icons) =>
-  items
-    .map(
-      ([title, text, tag], i) => `
-      <article class="card" data-spotlight>
-        <div class="sym" aria-hidden="true">${icons[i % icons.length]}</div>
-        <h3>${esc(title)}</h3>
-        <p>${esc(text)}</p>
-        ${tag ? `<span class="card-tag">${esc(tag)}</span>` : ''}
-      </article>`
-    )
-    .join('');
+/* ---------- Live AI Bot Simulator Scenarios ---------- */
+const simScenarios = [
+  {
+    label: 'Ночной вопрос с Авито (03:12)',
+    user: 'Привет! iPhone 15 128 ГБ есть в наличии? Можно в рассрочку?',
+    bot: 'Да, есть в наличии. Цена сверена с сайтом, рассрочка оформляется за 10 минут. Оставить телефон в резерв до утра?',
+    tg: 'Авито → Заявка в Telegram: интерес к iPhone 15 + рассрочка',
+  },
+  {
+    label: 'Обновление прайса поставщика',
+    user: 'Пришёл новый прайс-лист (420 позиций). Обнови цены.',
+    bot: 'Прайс разобран, применена твоя наценка, обновлены витрина, бот и объявления на Авито. Расхождений нет.',
+    tg: 'Автопрайс → Витрина и Авито синхронизированы',
+  },
+  {
+    label: 'Статус ремонта по номеру заказа',
+    user: 'Подскажите, заказ #1842 уже готов?',
+    bot: 'Заказ #1842 (замена дисплея) готов к выдаче. Можно забирать сегодня до 19:00.',
+    tg: 'TMV Hub → Клиент получил статус сам, без звонка мастеру',
+  },
+  {
+    label: 'Утренняя сводка в Пульс',
+    user: 'Что важного требует внимания на сегодня?',
+    bot: 'Собрал 3 пункта: 2 новых лота на торгах, 1 пост ждёт утверждения кнопкой, все заказы в CRM в сроке.',
+    tg: 'Пульс → Карточка согласования «Утвердить / Переделать»',
+  },
+];
+
+/* ---------- Unified Bots Catalog (11 Bots with Categories) ---------- */
+const allBots = [
+  { title: bots.live[0][0], text: bots.live[0][1], tag: bots.live[0][2], cat: 'content', live: true, icon: SVG.bolt },
+  { title: bots.live[1][0], text: bots.live[1][1], tag: 'В бою', cat: 'sales', live: true, icon: SVG.chat },
+  { title: bots.live[2][0], text: bots.live[2][1], tag: bots.live[2][2], cat: 'ops', live: true, icon: SVG.box },
+  { title: bots.live[3][0], text: bots.live[3][1], tag: 'В бою', cat: 'ops', live: true, icon: SVG.bell },
+  { title: bots.live[4][0], text: bots.live[4][1], tag: bots.live[4][2], cat: 'ops', live: true, icon: SVG.check },
+  { title: bots.live[5][0], text: bots.live[5][1], tag: 'В бою', cat: 'ops', live: true, icon: SVG.cam },
+  { title: bots.market[0][0], text: bots.market[0][1], tag: 'Под задачу', cat: 'sales', live: false, icon: SVG.cal },
+  { title: bots.market[1][0], text: bots.market[1][1], tag: 'Под задачу', cat: 'sales', live: false, icon: SVG.sliders },
+  { title: bots.market[2][0], text: bots.market[2][1], tag: 'Под задачу', cat: 'sales', live: false, icon: SVG.tag },
+  { title: bots.market[3][0], text: bots.market[3][1], tag: 'Под задачу', cat: 'content', live: false, icon: SVG.star },
+  { title: bots.market[4][0], text: bots.market[4][1], tag: 'Под задачу', cat: 'content', live: false, icon: SVG.send },
+];
+
+const toolIcons = [SVG.mic, SVG.swap, SVG.cam];
+const caseKind = (name) => {
+  if (/TMV Hub/i.test(name)) return 'CRM-система';
+  if (/Valyx/i.test(name)) return 'Аналитика WB';
+  if (/Бот|Авито/i.test(name)) return 'ИИ-бот и автоматизация';
+  if (/Контент/i.test(name)) return 'Контент-конвейер';
+  return 'Сайт и SEO';
+};
 
 const caseCard = (item) => `
   <article class="card case" data-spotlight>
     <div class="case-media">
+      <span class="case-badge">${esc(caseKind(item.name))}</span>
       ${
         item.shot
           ? `<img src="../../assets/shots/${esc(item.shot)}" alt="${esc(item.name)}" loading="lazy">`
@@ -137,6 +197,10 @@ const caseCard = (item) => `
     </div>
   </article>`;
 
+const tickerHtml = [...tickerItems, ...tickerItems]
+  .map(([tag, text]) => `<div class="ticker-item"><span>${esc(tag)}</span>${esc(text)}</div>`)
+  .join('');
+
 const app = document.querySelector('#app');
 app.innerHTML = `
 <header class="topbar">
@@ -144,6 +208,7 @@ app.innerHTML = `
   <nav class="nav" aria-label="Навигация">
     <a href="#showcase">Витрина</a>
     <a href="#system">Система</a>
+    <a href="#bots">ИИ-боты</a>
     <a href="#cases">Кейсы</a>
     <a href="#prices">Цены</a>
     <a href="#about">Обо мне</a>
@@ -156,12 +221,12 @@ app.innerHTML = `
   <section class="hero" id="hero">
     <div class="wrap hero-grid">
       <div>
-        <span class="badge"><span class="badge-dot"></span>Разработка и автоматизация для бизнеса</span>
-        <h1>Твой бизнес отвечает клиентам, даже когда ты спишь</h1>
-        <p class="hero-lead">21 год в технике и собственный магазин с сервисом ПроГаджет. Сначала проверяю ботов, сайты и CRM на своём бизнесе, потом внедряю тебе.</p>
+        <span class="badge"><span class="pulse-dot"></span>ИИ-агенты, боты и сайты для бизнеса</span>
+        <h1>Твой бизнес отвечает клиентам, <span class="hl">даже когда ты спишь</span></h1>
+        <p class="hero-lead">21 год в технике и собственный магазин с сервисом ПроГаджет. Сначала проверяю ИИ-ботов, сайты и CRM на своём бизнесе, потом внедряю тебе.</p>
         <div class="actions">
           <a class="btn btn-blue" href="${TG}" target="_blank" rel="noopener noreferrer">Обсудить проект в Telegram</a>
-          <a class="btn btn-light" href="#system">Смотреть схему системы</a>
+          <a class="btn btn-light" href="#bots">Попробовать ИИ-бота</a>
         </div>
         <div class="hero-meta">
           <span><i></i>Цена фиксируется до старта</span>
@@ -170,22 +235,39 @@ app.innerHTML = `
         </div>
       </div>
 
-      <div class="canvas-card">
-        <div class="canvas-head">
-          <div class="canvas-dots"><span></span><span></span><span></span></div>
-          <span>Наведи курсор на блоки TMV LABS</span>
+      <div class="hero-visual">
+        <div class="float-chip fc-1">
+          <div class="mini-bot">${BOT_MASCOT}</div>
+          <div><strong>ИИ-агент онлайн</strong><span>Ответил клиенту в 03:12</span></div>
         </div>
-        <div class="canvas-stage">
-          <canvas id="logo-canvas" width="760" height="520" aria-label="Интерактивная сборка знака TMV LABS из модульных блоков"></canvas>
+
+        <div class="float-chip fc-2">
+          <div class="mini-bot">${BOT_MASCOT}</div>
+          <div><strong>Заявка в Telegram</strong><span>Прайс и наличие сверены</span></div>
         </div>
-        <div class="canvas-pills">
-          <div class="canvas-pill"><strong>Боты 24/7</strong><span>Ответ за секунды</span></div>
-          <div class="canvas-pill"><strong>Свои системы</strong><span>CRM и аналитика</span></div>
-          <div class="canvas-pill"><strong>Сайты + SEO</strong><span>Заявки из поиска</span></div>
+
+        <div class="canvas-card">
+          <div class="canvas-head">
+            <div class="canvas-dots"><span></span><span></span><span></span></div>
+            <span>Наведи курсор на блоки TMV LABS</span>
+          </div>
+          <div class="canvas-stage">
+            <canvas id="logo-canvas" width="760" height="520" aria-label="Интерактивная сборка знака TMV LABS"></canvas>
+          </div>
+          <div class="canvas-pills">
+            <div class="canvas-pill"><strong>11 форматов ботов</strong><span>Telegram, Авито, MAX</span></div>
+            <div class="canvas-pill"><strong>Свои системы</strong><span>CRM и аналитика</span></div>
+            <div class="canvas-pill"><strong>Сайты + SEO</strong><span>Заявки из Яндекса</span></div>
+          </div>
         </div>
       </div>
     </div>
   </section>
+
+  <!-- LIVE TICKER -->
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track">${tickerHtml}</div>
+  </div>
 
   <!-- CLERK INTERACTIVE SHOWCASE -->
   <section class="showcase" id="showcase">
@@ -193,7 +275,7 @@ app.innerHTML = `
       <div class="showcase-top">
         <div>
           <p class="eyebrow">Живая витрина</p>
-          <h2 style="font:400 clamp(26px,3.2vw,40px)/1.08 var(--display);margin:0;letter-spacing:-.025em">Что сделаю для твоего бизнеса</h2>
+          <h2 style="font:800 clamp(26px,3.2vw,42px)/1.08 var(--display);margin:0;letter-spacing:-.035em">Что сделаю для твоего бизнеса</h2>
         </div>
         <div class="showcase-tabs" role="tablist" aria-label="Направления TMV Labs">
           ${liveTabs
@@ -212,12 +294,12 @@ app.innerHTML = `
   <section class="section" id="system">
     <div class="wrap">
       <div class="section-head">
-        <p class="eyebrow">Карта системы</p>
+        <p class="eyebrow">Карта автоматизации</p>
         <h2>Из разрозненных каналов в понятный результат</h2>
-        <p class="lead">Наведи на любой канал слева: увидишь, как заявки, цены и сообщения проходят через ядро автоматизации.</p>
+        <p class="lead">Схема работает сама по циклу или по наведению: выбери любой канал слева и посмотри маршрут данных.</p>
       </div>
 
-      <div class="map-shell">
+      <div class="map-shell" id="map-shell">
         <div class="map-stage" id="map-stage">
           <svg class="map-svg" id="map-svg" viewBox="0 0 1000 380" preserveAspectRatio="none" aria-hidden="true"></svg>
 
@@ -263,18 +345,44 @@ app.innerHTML = `
     </div>
   </section>
 
-  <!-- BOTS BENTO -->
-  <section class="section" style="background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <!-- BOTS SIMULATOR + 11 BOTS CATALOG -->
+  <section class="section" id="bots" style="background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
     <div class="wrap">
       <div class="section-head">
-        <p class="eyebrow">Боты и автоматизация</p>
-        <h2>Сценарии, которые уже работают в живом бизнесе</h2>
-        <p class="lead">Каждый бот решает конкретную задачу без лишних звонков и ручного контроля.</p>
+        <p class="eyebrow">ИИ-боты и автоматизация</p>
+        <h2>11 форматов ботов, которые забирают рутину</h2>
+        <p class="lead">Нажми на любой сценарий ниже, чтобы увидеть, как ИИ-агент отрабатывает задачу вживую.</p>
       </div>
-      <div class="grid grid-3">${cardList(bots.live, botLiveIcons)}</div>
 
-      <div class="sub-label">Делаю под задачу бизнеса</div>
-      <div class="grid grid-3">${cardList(bots.market, botMarketIcons)}</div>
+      <div class="sim-card">
+        <div>
+          <div class="sim-agent">
+            <div class="sim-avatar">${BOT_MASCOT}</div>
+            <div>
+              <strong style="display:block;font-size:17px">Живой симулятор ИИ-бота</strong>
+              <span style="font-size:13px;color:var(--muted)">Выбери реальный рабочий сценарий</span>
+            </div>
+          </div>
+          <div class="sim-prompts" id="sim-prompts">
+            ${simScenarios
+              .map(
+                (s, i) =>
+                  `<button type="button" class="sim-btn ${i === 0 ? 'active' : ''}" data-sim="${i}"><span>${esc(s.label)}</span><span>→</span></button>`
+              )
+              .join('')}
+          </div>
+        </div>
+        <div class="sim-window" id="sim-window" aria-live="polite"></div>
+      </div>
+
+      <div class="filter-bar" role="tablist" aria-label="Категории ботов">
+        <button type="button" class="filter-btn active" data-cat="all">Все боты (11)</button>
+        <button type="button" class="filter-btn" data-cat="sales">Продажи и Авито (5)</button>
+        <button type="button" class="filter-btn" data-cat="ops">Сервис, CRM и сводки (4)</button>
+        <button type="button" class="filter-btn" data-cat="content">Контент, отзывы и база (3)</button>
+      </div>
+
+      <div class="grid grid-3" id="bots-grid"></div>
     </div>
   </section>
 
@@ -312,7 +420,7 @@ app.innerHTML = `
       <div class="section-head">
         <p class="eyebrow">Реальные проекты и скриншоты</p>
         <h2>${esc(cases.h)}</h2>
-        <p class="lead">Живые интерфейсы, сайты, CRM и боты, которыми я и клиенты пользуемся каждый день.</p>
+        <p class="lead">Сайты ПроГаджет, ProService (TMV Repair), Аксинья Про, Гаджет Про, аналитика Valyx, CRM TMV Hub и рабочие боты.</p>
       </div>
 
       <div class="grid cases">${cases.list.map(caseCard).join('')}</div>
@@ -336,7 +444,10 @@ app.innerHTML = `
           .map(
             ([t, p], i) => `
           <article class="card" data-spotlight>
-            <div class="sym" aria-hidden="true">${toolIcons[i % toolIcons.length]}</div>
+            <div class="card-top">
+              <div class="sym" aria-hidden="true">${toolIcons[i % toolIcons.length]}</div>
+              <span class="card-tag soft">macOS</span>
+            </div>
             <h3>${esc(t)}</h3>
             <p>${esc(p)}</p>
           </article>`
@@ -382,7 +493,7 @@ app.innerHTML = `
           <a class="btn btn-blue" style="margin-top:24px" href="${TG}" target="_blank" rel="noopener noreferrer">${esc(seo.cta)}</a>
         </div>
         <article class="card" data-spotlight style="display:flex;flex-direction:column;justify-content:center">
-          <div class="sym" aria-hidden="true">${SVG.globe}</div>
+          <div class="card-top"><div class="sym" aria-hidden="true">${SVG.globe}</div><span class="card-tag">SEO-блог</span></div>
           <p class="eyebrow">${esc(seo.works)}</p>
           <h3>Статьи по реальным запросам клиентов</h3>
           <p>Не пустые тексты ради галочки, а ответы на вопросы покупателей с переходом в заявку на сайте.</p>
@@ -424,8 +535,7 @@ app.innerHTML = `
 
         <article class="card" data-spotlight style="display:flex;flex-direction:column;justify-content:space-between">
           <div>
-            <div class="sym" aria-hidden="true">${SVG.check}</div>
-            <p class="eyebrow">Личная ответственность</p>
+            <div class="card-top"><div class="sym" aria-hidden="true">${SVG.check}</div><span class="card-tag">Личный подход</span></div>
             <h3>Веду проект сам, от разбора до запуска</h3>
             <p style="font-size:15px;margin-top:10px">${esc(prices.me)}</p>
             <p style="font-size:15px;margin-top:14px;color:var(--ink);font-weight:700">${esc(math.own)}</p>
@@ -473,6 +583,8 @@ app.innerHTML = `
 
 <a class="sticky" id="sticky-cta" href="${TG}" target="_blank" rel="noopener noreferrer">${esc(fin.sticky)}</a>
 `;
+
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ---------- 1. Showcase Tabs ---------- */
 const demoBox = document.querySelector('#demo-box');
@@ -523,10 +635,11 @@ document.querySelectorAll('[data-tab]').forEach((btn) => {
   });
 });
 
-/* ---------- 2. Big Interactive SVG Map ---------- */
+/* ---------- 2. Big Interactive SVG Map with Auto-Cycle ---------- */
 const mapSvg = document.querySelector('#map-svg');
 const mapTag = document.querySelector('#map-tag');
 const mapInfo = document.querySelector('#map-info');
+const mapShell = document.querySelector('#map-shell');
 
 const inY = [46, 118, 190, 262, 334];
 const outY = [72, 150, 228, 306];
@@ -536,18 +649,21 @@ function buildMapPaths() {
   inY.forEach((y, i) => {
     const d = `M 260 ${y} C 365 ${y}, 385 190, 495 190`;
     paths.push(`<path class="map-path" data-in-path="${i}" d="${d}"/>`);
-    paths.push(`<circle class="map-pulse" data-in-pulse="${i}" r="4.5"><animateMotion dur="1.7s" repeatCount="indefinite" path="${d}"/></circle>`);
+    paths.push(`<circle class="map-pulse" data-in-pulse="${i}" r="4.5"><animateMotion dur="1.6s" repeatCount="indefinite" path="${d}"/></circle>`);
   });
   outY.forEach((y, i) => {
     const d = `M 505 190 C 615 190, 635 ${y}, 740 ${y}`;
     paths.push(`<path class="map-path" data-out-path="${i}" d="${d}"/>`);
-    paths.push(`<circle class="map-pulse" data-out-pulse="${i}" r="4.5"><animateMotion dur="1.7s" begin="0.4s" repeatCount="indefinite" path="${d}"/></circle>`);
+    paths.push(`<circle class="map-pulse" data-out-pulse="${i}" r="4.5"><animateMotion dur="1.6s" begin="0.35s" repeatCount="indefinite" path="${d}"/></circle>`);
   });
   mapSvg.innerHTML = paths.join('');
 }
 buildMapPaths();
 
+let currentRoute = 0;
+let mapPaused = false;
 function setRoute(idx) {
+  currentRoute = idx;
   const item = mapInputs[idx];
   document.querySelectorAll('[data-route]').forEach((n) => n.classList.toggle('active', Number(n.dataset.route) === idx));
   document.querySelectorAll('[data-out]').forEach((o) => o.classList.toggle('active', item.outIdx.includes(Number(o.dataset.out))));
@@ -566,17 +682,93 @@ document.querySelectorAll('[data-route]').forEach((node) => {
   node.addEventListener('click', activate);
   node.addEventListener('focus', activate);
 });
+mapShell.addEventListener('mouseenter', () => { mapPaused = true; });
+mapShell.addEventListener('mouseleave', () => { mapPaused = false; });
 
-/* ---------- 3. Clerk Spotlight Hover ---------- */
-document.querySelectorAll('[data-spotlight]').forEach((el) => {
-  el.addEventListener('pointermove', (e) => {
-    const r = el.getBoundingClientRect();
-    el.style.setProperty('--mx', `${e.clientX - r.left}px`);
-    el.style.setProperty('--my', `${e.clientY - r.top}px`);
+if (!reduceMotion) {
+  setInterval(() => {
+    if (!mapPaused) setRoute((currentRoute + 1) % mapInputs.length);
+  }, 3200);
+}
+
+/* ---------- 3. Live AI Bot Simulator ---------- */
+const simWindow = document.querySelector('#sim-window');
+let simTimer = null;
+
+function runSim(idx, instant = false) {
+  clearTimeout(simTimer);
+  const s = simScenarios[idx];
+  document.querySelectorAll('[data-sim]').forEach((b) => b.classList.toggle('active', Number(b.dataset.sim) === idx));
+
+  if (instant || reduceMotion) {
+    simWindow.innerHTML = `
+      <div class="sim-msg user">${esc(s.user)}</div>
+      <div class="sim-msg bot">${esc(s.bot)}</div>
+      <div class="sim-msg tg"><span>${esc(s.tg)}</span><b>✓ Выполнено</b></div>
+    `;
+    return;
+  }
+
+  simWindow.innerHTML = `
+    <div class="sim-msg user">${esc(s.user)}</div>
+    <div class="sim-msg bot"><span class="typing-dots"><i></i><i></i><i></i></span></div>
+  `;
+  simTimer = setTimeout(() => {
+    simWindow.innerHTML = `
+      <div class="sim-msg user">${esc(s.user)}</div>
+      <div class="sim-msg bot">${esc(s.bot)}</div>
+      <div class="sim-msg tg"><span>${esc(s.tg)}</span><b>✓ Выполнено</b></div>
+    `;
+  }, 550);
+}
+runSim(0, true);
+document.querySelectorAll('[data-sim]').forEach((btn) => {
+  btn.addEventListener('click', () => runSim(Number(btn.dataset.sim), false));
+});
+
+/* ---------- 4. Bots Filter & Grid ---------- */
+const botsGrid = document.querySelector('#bots-grid');
+function bindSpotlight(root = document) {
+  root.querySelectorAll('[data-spotlight]').forEach((el) => {
+    if (el.dataset.spotBound) return;
+    el.dataset.spotBound = '1';
+    el.addEventListener('pointermove', (e) => {
+      const r = el.getBoundingClientRect();
+      el.style.setProperty('--mx', `${e.clientX - r.left}px`);
+      el.style.setProperty('--my', `${e.clientY - r.top}px`);
+    });
+  });
+}
+
+function renderBots(cat = 'all') {
+  const list = cat === 'all' ? allBots : allBots.filter((b) => b.cat === cat);
+  botsGrid.innerHTML = list
+    .map(
+      (b) => `
+      <article class="card" data-spotlight>
+        <div class="card-top">
+          <div class="sym" aria-hidden="true">${b.icon}</div>
+          <span class="card-tag ${b.live ? '' : 'soft'}">${esc(b.tag)}</span>
+        </div>
+        <h3>${esc(b.title)}</h3>
+        <p>${esc(b.text)}</p>
+      </article>`
+    )
+    .join('');
+  bindSpotlight(botsGrid);
+}
+renderBots('all');
+bindSpotlight(document);
+
+document.querySelectorAll('[data-cat]').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-cat]').forEach((b) => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderBots(btn.dataset.cat);
   });
 });
 
-/* ---------- 4. Lead Form ---------- */
+/* ---------- 5. Lead Form ---------- */
 document.querySelector('#lead-form').addEventListener('submit', (e) => {
   e.preventDefault();
   const form = e.currentTarget;
@@ -590,7 +782,7 @@ document.querySelector('#lead-form').addEventListener('submit', (e) => {
   form.reset();
 });
 
-/* ---------- 5. Mobile Sticky CTA (only after Hero) ---------- */
+/* ---------- 6. Mobile Sticky CTA (only after Hero) ---------- */
 const stickyCta = document.querySelector('#sticky-cta');
 const heroEl = document.querySelector('#hero');
 const finalEl = document.querySelector('#final');
@@ -603,10 +795,9 @@ function updateSticky() {
 window.addEventListener('scroll', updateSticky, { passive: true });
 updateSticky();
 
-/* ---------- 6. Crisp Interactive 2D Pixel Assembly: TMV LABS ---------- */
+/* ---------- 7. Crisp Interactive 2D Pixel Assembly: TMV LABS ---------- */
 const canvas = document.querySelector('#logo-canvas');
 const ctx = canvas.getContext('2d');
-const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function initLogoCanvas() {
   const W = canvas.width;
@@ -618,9 +809,9 @@ function initLogoCanvas() {
   mctx.fillStyle = '#000';
   mctx.textAlign = 'center';
   mctx.textBaseline = 'middle';
-  mctx.font = '900 176px "Dela Gothic One", Manrope, sans-serif';
+  mctx.font = '800 182px Onest, Manrope, sans-serif';
   mctx.fillText('TMV', W / 2, H * 0.34);
-  mctx.font = '800 116px "Dela Gothic One", Manrope, sans-serif';
+  mctx.font = '700 120px Unbounded, Onest, sans-serif';
   mctx.fillText('LABS', W / 2, H * 0.72);
 
   const imgData = mctx.getImageData(0, 0, W, H).data;
@@ -632,16 +823,14 @@ function initLogoCanvas() {
     for (let x = 10; x < W - 10; x += step) {
       if (imgData[(y * W + x) * 4 + 3] > 90) {
         const isTop = y < H * 0.54;
-        const startSpread = reduceMotion ? 0 : 140;
+        const startSpread = reduceMotion ? 0 : 150;
         particles.push({
           ox: x,
           oy: y,
           x: x + (Math.random() - 0.5) * startSpread,
           y: y + (Math.random() - 0.5) * startSpread,
-          vx: 0,
-          vy: 0,
           phase: (x + y) * 0.015,
-          isBlue: isTop ? Math.random() > 0.25 : Math.random() > 0.65,
+          isBlue: isTop ? Math.random() > 0.24 : Math.random() > 0.62,
         });
       }
     }
@@ -661,23 +850,23 @@ function initLogoCanvas() {
 
   function draw(now = 0) {
     ctx.clearRect(0, 0, W, H);
-    const t = now * 0.0018;
+    const t = now * 0.002;
 
     for (const p of particles) {
       const dx = p.x - mx;
       const dy = p.y - my;
       const dist = Math.hypot(dx, dy);
-      const radius = 125;
+      const radius = 130;
       let tx = p.ox;
       let ty = p.oy;
 
       if (!reduceMotion) {
-        tx += Math.sin(t + p.phase) * 1.4;
-        ty += Math.cos(t * 0.9 + p.phase) * 1.4;
+        tx += Math.sin(t + p.phase) * 1.6;
+        ty += Math.cos(t * 0.9 + p.phase) * 1.6;
       }
 
       if (dist < radius && dist > 0.1) {
-        const force = (1 - dist / radius) * 58;
+        const force = (1 - dist / radius) * 62;
         tx += (dx / dist) * force;
         ty += (dy / dist) * force;
       }
@@ -686,11 +875,10 @@ function initLogoCanvas() {
       p.y += (ty - p.y) * (reduceMotion ? 1 : 0.14);
 
       const glow = dist < radius ? 1 - dist / radius : 0;
-      ctx.fillStyle = glow > 0.2 ? '#2357c6' : p.isBlue ? '#2357c6' : '#1e293b';
-      ctx.globalAlpha = glow > 0.2 ? 1 : p.isBlue ? 0.92 : 0.86;
-      const r = 2.2;
+      ctx.fillStyle = glow > 0.2 ? '#3b82f6' : p.isBlue ? '#2357c6' : '#0f172a';
+      ctx.globalAlpha = glow > 0.2 ? 1 : p.isBlue ? 0.94 : 0.88;
       ctx.beginPath();
-      ctx.roundRect(p.x - size / 2, p.y - size / 2, size, size, r);
+      ctx.roundRect(p.x - size / 2, p.y - size / 2, size, size, 2.3);
       ctx.fill();
     }
     ctx.globalAlpha = 1;
