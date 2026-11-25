@@ -147,8 +147,8 @@ export const CASES = [
   { name: 'Авито-автоматизация', kind: 'ИИ-бот 24/7', task: 'Объявления расходились с сайтом, вопросы ночью оставались без ответа.', did: 'Сверка объявлений и цен с сайтом, ИИ-ответы клиентам.', res: 'Актуальные цены и ответы 24/7 без ручной сверки', shot: null },
   { name: 'Valyx', kind: 'Аналитика WB', task: 'Продавец Wildberries видел выручку, но не прибыль.', did: 'Аналитика прибыли после комиссий, эквайринга и расходов.', res: 'Чистая прибыль по каждому каналу', shot: './assets/shots/valyx-real.jpg' },
   { name: 'Гаджет Про', kind: 'Сайт и боты', task: 'Магазину техники нужны продажи в мессенджерах и опт без ручной рассылки.', did: 'Боты в Telegram и MAX, опт-фид, автопостинг.', res: 'Сайт и витрина магазина техники', shot: './assets/shots/gadget-pro.jpg' },
-  { name: 'Аксинья Про', kind: 'Сайт уроков', task: 'Онлайн-урокам нужен свой сайт.', did: 'Сайт онлайн-уроков aksinyapro.ru.', res: 'Живой сайт онлайн-уроков', shot: './assets/shots/aksinya.jpg' },
-  { name: 'Сайты ПроГаджет и ProService (TMV Repair)', kind: 'Сайты и SEO', task: 'Клиенты искали сервис в поиске и на картах.', did: 'Сайты магазина и сервиса proserviceul.ru со статьями для Яндекса.', res: 'Клиенты из поиска, а не только из рекламы', shot: './assets/shots/tmv-repair.jpg' },
+  { name: 'Аксинья Про', kind: 'Сайт уроков', task: 'Онлайн-урокам нужен свой сайт.', did: 'Сайт онлайн-уроков aksinyapro.ru.', res: 'Живой сайт онлайн-уроков', shot: './assets/shots/aksinya.jpg', video: './assets/videos/aksinya.mp4' },
+  { name: 'Сайты ПроГаджет и ProService (TMV Repair)', kind: 'Сайты и SEO', task: 'Клиенты искали сервис в поиске и на картах.', did: 'Сайты магазина и сервиса proserviceul.ru со статьями для Яндекса.', res: 'Клиенты из поиска, а не только из рекламы', shot: './assets/shots/tmv-repair.jpg', video: './assets/videos/proservice.mp4' },
   { name: 'Контент-конвейер', kind: 'Контент-бот', task: 'Ролики снимались, но выходили нерегулярно.', did: 'Записал видео за 15 минут, система публикует везде по расписанию.', res: 'Telegram, MAX, Instagram, YouTube, ВК', shot: './assets/shots/content-hub.jpg' },
 ];
 

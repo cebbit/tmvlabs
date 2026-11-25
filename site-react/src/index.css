@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: "Onest", "Manrope", system-ui, sans-serif;
-  --font-sans: "Manrope", "Onest", system-ui, -apple-system, sans-serif;
+  --font-display: "Geologica", system-ui, -apple-system, sans-serif;
+  --font-sans: "Geologica", system-ui, -apple-system, sans-serif;
   --color-lusion-bg: #f0f1fa;
-  --color-lusion-blue: #1b3bff;
-  --color-lusion-dark: #131418;
+  --color-lusion-blue: #102ef5;
+  --color-lusion-dark: #0e1015;
 }
 
 @layer base {
@@ -23,7 +23,6 @@
   }
 }
 
-/* Lusion-style arrow slide on case hover */
 .lusion-case-title {
   display: inline-flex;
   align-items: center;
@@ -52,7 +51,6 @@
   transform: translateX(0);
 }
 
-/* Lusion pill button hover */
 .lusion-pill {
   transition: background-color 0.25s ease, color 0.25s ease, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 }

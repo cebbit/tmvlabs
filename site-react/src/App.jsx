@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Lenis from 'lenis';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowUpRight, ArrowRight, Plus } from 'lucide-react';
+import { ArrowUpRight, ArrowRight } from 'lucide-react';
 import { TG, CASES, ALL_BOTS, PRICES, STEPS, TOOLS, TRUST_STATS } from './data/content';
 import { LusionHero3D } from './components/LusionHero3D';
 
@@ -154,22 +154,15 @@ export default function App() {
         </div>
 
         {/* Giant rounded 3D Interactive Stage */}
-        <div className="mx-auto w-full max-w-[1440px] flex-1 min-h-[420px] sm:min-h-[500px] max-h-[680px] relative rounded-[20px] sm:rounded-[24px] overflow-hidden bg-[#131418] shadow-[0_24px_60px_-24px_rgba(11,12,16,0.28)]">
+        <div className="mx-auto w-full max-w-[1440px] flex-1 min-h-[420px] sm:min-h-[500px] max-h-[680px] relative rounded-[20px] sm:rounded-[24px] overflow-hidden bg-[#0d0f14] shadow-[0_24px_60px_-24px_rgba(11,12,16,0.28)]">
           <LusionHero3D />
-          <div className="pointer-events-none absolute bottom-4 right-5 hidden sm:block text-[11px] font-bold uppercase tracking-[0.12em] text-white/45">
-            Двигай мышкой или кликни
-          </div>
         </div>
 
-        {/* Signature Lusion bottom cross-bar */}
-        <div className="mx-auto w-full max-w-[1440px] pt-5 flex items-center justify-between text-[11px] font-bold uppercase tracking-[0.12em] text-[#0b0c10]">
-          <Plus className="h-3.5 w-3.5 stroke-[2]" />
-          <Plus className="hidden sm:block h-3.5 w-3.5 stroke-[2]" />
-          <a href="#work" className="hover:text-[#1b3bff] transition-colors">
+        {/* Clean minimal scroll cue (no decorative pluses) */}
+        <div className="mx-auto w-full max-w-[1440px] pt-5 flex items-center justify-center text-[11px] font-semibold uppercase tracking-[0.14em] text-[#0b0c10]/60">
+          <a href="#work" className="hover:text-[#102ef5] transition-colors">
             Листай вниз
           </a>
-          <Plus className="hidden sm:block h-3.5 w-3.5 stroke-[2]" />
-          <Plus className="h-3.5 w-3.5 stroke-[2]" />
         </div>
       </section>
 
@@ -229,13 +222,23 @@ export default function App() {
                 rel="noopener noreferrer"
                 className="group block"
               >
-                <div className="overflow-hidden rounded-[18px] bg-[#131418] aspect-[16/10]">
-                  {c.shot ? (
+                <div className="overflow-hidden rounded-[18px] bg-[#0d0f14] aspect-[16/10]">
+                  {c.video ? (
+                    <video
+                      src={c.video}
+                      poster={c.shot}
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+                    />
+                  ) : c.shot ? (
                     <img
                       src={c.shot}
                       alt={c.name}
                       loading="lazy"
-                      className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.045]"
+                      className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
                     />
                   ) : (
                     <div className="h-full w-full p-8 sm:p-10 bg-[#131418] text-white flex flex-col justify-between">
