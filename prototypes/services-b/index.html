@@ -24,33 +24,50 @@
   .intro { min-height: 70vh; display: grid; place-items: center; text-align: center; color: var(--muted); padding: 0 16px; }
   .intro a { color: var(--ink); font-weight: 700; }
 
-  /* Блок 2: 5 услуг, на каждую свой экран продукта. Экран собирается из блоков пазлом, при прокрутке перестраивается из тех же блоков. */
-  .svc { position: relative; height: 240vh; }
-  .stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
-  canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 3; pointer-events: none; }
-  .side { position: absolute; left: clamp(16px, 5vw, 72px); top: clamp(56px, 12vh, 120px); width: min(460px, 40vw); z-index: 6; }
-  .side h2 { font-family: 'Dela Gothic One', system-ui, sans-serif; font-weight: 400; font-size: clamp(28px, 3.4vw, 50px); line-height: 1.05; letter-spacing: -0.02em; margin: 0 0 28px; }
-  .bar { display: flex; gap: 6px; margin-bottom: 22px; }
-  .bar i { flex: 1; height: 10px; border-radius: 99px; background: rgba(0,0,0,.1); transition: background .25s, transform .2s; cursor: pointer; position: relative; }
-  .bar i:hover { background: rgba(35,87,198,.45); }
-  .bar i.on { background: var(--accent); }
-  .cards { position: relative; min-height: 300px; }
-  .card { position: absolute; inset: 0 0 auto 0; opacity: 0; transform: translateY(14px); transition: opacity .25s, transform .35s cubic-bezier(.2,.8,.2,1); pointer-events: none; }
-  .card.active { opacity: 1; transform: none; pointer-events: auto; transition-delay: .08s; }
-  .card .n { font-size: 13px; font-weight: 700; color: var(--muted); letter-spacing: .04em; margin-bottom: 10px; }
-  .card h3 { font-size: clamp(20px, 1.8vw, 26px); line-height: 1.2; font-weight: 800; margin: 0 0 12px; letter-spacing: -0.01em; }
-  .card p { font-size: clamp(15px, 1.15vw, 17px); line-height: 1.5; color: var(--muted); margin: 0 0 12px; }
-  .card .works { color: var(--ink); font-size: 14px; }
-  .card .works b { font-weight: 700; }
-  .btn { display: inline-flex; align-items: center; margin-top: 8px; background: var(--ink); color: #fff; text-decoration: none; font-weight: 700; padding: 14px 20px; border-radius: 999px; font-size: 15px; position: relative; z-index: 4; }
-  .btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  /* Блок 2: 5 услуг — свободный скролл, переключение по кликабельным табам + автоцикл */
+  #svc.svc { position: relative; height: auto; padding: clamp(56px, 7vw, 104px) 0; }
+  #svc .stage {
+    position: relative; height: auto; overflow: visible;
+    max-width: 1240px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 32px);
+    display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: clamp(28px, 4vw, 56px); align-items: center;
+  }
+  #svc .stage::after { display: none; }
+  #svc .side { position: relative; left: auto; top: auto; width: 100%; z-index: 6; }
+  #svc .side h2 { font-family: 'Dela Gothic One', system-ui, sans-serif; font-weight: 400; font-size: clamp(28px, 3.4vw, 48px); line-height: 1.06; letter-spacing: -0.02em; margin: 0 0 22px; }
+  #svc .svc-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+  #svc .svc-tabs button {
+    appearance: none; border: 1px solid rgba(17,17,17,.12); background: #fff; color: var(--ink);
+    font: 700 13px/1 Manrope, system-ui, sans-serif; padding: 10px 14px; border-radius: 999px;
+    cursor: pointer; transition: background .2s, color .2s, border-color .2s, transform .15s, box-shadow .2s;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  #svc .svc-tabs button span { opacity: .5; font-size: 11px; }
+  #svc .svc-tabs button:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+  #svc .svc-tabs button.on { background: var(--accent); color: #fff; border-color: var(--accent); box-shadow: 0 8px 20px -8px rgba(35,87,198,.55); }
+  #svc .svc-tabs button.on span { opacity: .8; }
+  #svc .cards { position: relative; min-height: 250px; background: #fff; border: 1px solid rgba(17,17,17,.08); border-radius: 24px; padding: clamp(22px, 3vw, 32px); box-shadow: 0 20px 50px -28px rgba(17,19,24,.16); }
+  #svc .card { position: relative; display: none; opacity: 1; transform: none; pointer-events: auto; }
+  #svc .card.active { display: block; animation: svcFade .32s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes svcFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  #svc .card .n { font-size: 12px; font-weight: 800; color: var(--accent); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 10px; }
+  #svc .card h3 { font-size: clamp(20px, 1.9vw, 26px); line-height: 1.22; font-weight: 800; margin: 0 0 12px; letter-spacing: -0.015em; }
+  #svc .card p { font-size: clamp(15px, 1.1vw, 16px); line-height: 1.55; color: var(--muted); margin: 0 0 12px; }
+  #svc .card .works { color: var(--ink); font-size: 14px; background: #f5f7fc; padding: 10px 14px; border-radius: 12px; margin: 14px 0 18px; }
+  #svc .card .works b { font-weight: 700; color: var(--accent); }
+  #svc .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin-top: 4px; background: var(--accent); color: #fff; text-decoration: none; font-weight: 700; padding: 14px 24px; border-radius: 999px; font-size: 15px; position: relative; z-index: 6; box-shadow: 0 10px 24px -10px rgba(35,87,198,.6); transition: transform .18s, background .18s; }
+  #svc .btn:hover { background: #1c47a6; transform: translateY(-2px); }
+  #svc .btn:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 
-  /* Рамка экрана продукта. Размер задаёт ширина, всё внутри в cqw, поэтому блоки и текст масштабируются вместе. */
-  .frame {
-    position: absolute; right: clamp(16px, 6vw, 110px); top: 50%; translate: 0 -50%;
-    width: min(520px, 42vw, calc((100svh - 120px) * 5 / 6)); aspect-ratio: 5 / 6;
-    background: var(--frame); border-radius: 4.6cqw; container-type: inline-size; z-index: 1;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.7), 0 40px 80px -40px rgba(40,30,10,.25);
+  #svc .frame-wrap { position: relative; width: 100%; max-width: 500px; margin: 0 auto; }
+  #svc canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 3; pointer-events: none; }
+  /* Рамка экрана продукта */
+  #svc .frame {
+    position: relative; right: auto; top: auto; translate: none;
+    width: 100%; aspect-ratio: 5 / 6;
+    background: var(--frame); border-radius: 28px; container-type: inline-size; z-index: 1;
+    border: 1px solid rgba(17,17,17,.08);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 36px 70px -36px rgba(17,19,24,.24);
   }
   .scr { position: absolute; inset: 0; container-type: inline-size; }
   .cap { position: absolute; left: 6%; top: -9cqw; font-size: 3.2cqw; font-weight: 700; color: var(--muted); opacity: 0; transition: opacity .3s; }
@@ -91,20 +108,15 @@
   @keyframes grain { 0% { transform: translate(0,0) } 20% { transform: translate(-3%,2%) } 40% { transform: translate(2%,-4%) } 60% { transform: translate(-4%,-1%) } 80% { transform: translate(3%,3%) } 100% { transform: translate(0,0) } }
   @media (prefers-reduced-motion: reduce) { .stage::after { animation: none; } }
 
-  @media (max-width: 760px) {
-    .svc { height: 190vh; }
-    .side { top: 28px; width: auto; right: 16px; }
-    .side h2 { font-size: 26px; margin-bottom: 14px; }
-    .bar { margin-bottom: 12px; }
-    .cards { min-height: 0; height: auto; }
-    .card { position: relative; display: none; }
-    .card.active { display: block; }
-    .card h3 { font-size: 18px; margin-bottom: 6px; }
-    .card p { font-size: 14px; margin-bottom: 6px; }
-    .card .works { font-size: 13px; }
-    .btn { padding: 11px 16px; font-size: 14px; margin-top: 2px; }
-    .frame { top: auto; bottom: 16px; left: 50%; right: auto; translate: -50% 0; width: min(calc(100% - 32px), calc((100svh - 400px) * 5 / 6)); }
-    .cap { top: -7.5cqw; }
+  @media (max-width: 900px) {
+    #svc .stage { grid-template-columns: 1fr; gap: 24px; }
+    #svc .side h2 { font-size: 28px; margin-bottom: 16px; }
+    #svc .svc-tabs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    #svc .svc-tabs::-webkit-scrollbar { display: none; }
+    #svc .svc-tabs button { flex: 0 0 auto; }
+    #svc .cards { min-height: 0; padding: 20px; }
+    #svc .btn { width: 100%; }
+    #svc .frame-wrap { max-width: 380px; }
   }
 </style>
 </head>
@@ -113,10 +125,15 @@
 
 <section class="svc" id="svc" aria-labelledby="svc-h">
   <div class="stage">
-    <canvas id="c" aria-hidden="true"></canvas>
     <div class="side">
       <h2 id="svc-h">Что сделаю для твоего бизнеса</h2>
-      <div class="bar" role="tablist" aria-label="Выбор направления"><i role="tab" tabindex="0" data-i="0" class="on" title="01 · Боты"></i><i role="tab" tabindex="0" data-i="1" title="02 · Прайсы"></i><i role="tab" tabindex="0" data-i="2" title="03 · CRM"></i><i role="tab" tabindex="0" data-i="3" title="04 · Прибыль"></i><i role="tab" tabindex="0" data-i="4" title="05 · Контент"></i></div>
+      <div class="svc-tabs" role="tablist" aria-label="Выбор направления">
+        <button type="button" role="tab" aria-selected="true" class="on" data-i="0"><span>01</span> Боты</button>
+        <button type="button" role="tab" aria-selected="false" data-i="1"><span>02</span> Прайсы</button>
+        <button type="button" role="tab" aria-selected="false" data-i="2"><span>03</span> CRM</button>
+        <button type="button" role="tab" aria-selected="false" data-i="3"><span>04</span> Прибыль</button>
+        <button type="button" role="tab" aria-selected="false" data-i="4"><span>05</span> Контент</button>
+      </div>
       <div class="cards">
         <article class="card active">
           <div class="n">01 / 05</div>
@@ -157,6 +174,8 @@
     </div>
 
     <!-- Экраны продукта: числа в них показательные, для макета. Координаты блоков в процентах рамки. -->
+    <div class="frame-wrap">
+    <canvas id="c" aria-hidden="true"></canvas>
     <div class="frame" aria-live="polite" aria-label="Превью активного направления">
       <div class="scr" data-s="0">
         <div class="cap">Telegram · бот TMV</div>
@@ -215,6 +234,7 @@
         <div class="b soft row" style="--x:6;--y:58;--w:88;--h:14"><span><small>Расписание</small><br><strong>каждый день в 18:00</strong></span><span class="chip">5 площадок</span></div>
         <div class="b acc ctr" style="--x:6;--y:78;--w:88;--h:15"><strong>Ты снимаешь, система публикует</strong></div>
       </div>
+    </div>
     </div>
   </div>
 </section>

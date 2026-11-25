@@ -1,43 +1,51 @@
-// Блок 2: прокрутка выбирает услугу (0..4). Работает и без WebGL: тексты и экраны переключаются классами.
-// Сцена (scene.js) слушает событие svc-step и собирает экран пазлом.
+// Блок 2: свободный скролл, переключение услуг по клику на табы + мягкий автоцикл с паузой при наведении.
 (() => {
   const sec = document.getElementById('svc');
+  if (!sec) return;
   const cards = [...sec.querySelectorAll('.card')];
   const scrs = [...sec.querySelectorAll('.scr')];
-  const segs = [...sec.querySelectorAll('.bar i')];
+  const tabs = [...sec.querySelectorAll('.svc-tabs button')];
   const n = scrs.length;
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   scrs.forEach(s => s.querySelectorAll('.b').forEach((b, i) => b.style.setProperty('--i', i)));
+
   let cur = -1;
+  let paused = false;
+  let timer = null;
+
   function setStep(s) {
-    if (s === cur) return;
+    if (s < 0 || s >= n || s === cur) return;
     const from = cur;
     cur = s;
     cards.forEach((c, i) => { c.classList.toggle('active', i === s); c.inert = i !== s; });
     scrs.forEach((c, i) => c.classList.toggle('active', i === s));
-    segs.forEach((c, i) => { c.classList.toggle('on', i <= s); c.setAttribute('aria-selected', String(i === s)); });
+    tabs.forEach((t, i) => {
+      t.classList.toggle('on', i === s);
+      t.setAttribute('aria-selected', String(i === s));
+    });
     window.svcStep = s;
     dispatchEvent(new CustomEvent('svc-step', { detail: { from, to: s } }));
   }
-  function tick() {
-    const r = sec.getBoundingClientRect();
-    const range = r.height - innerHeight;
-    if (range <= 0) { setStep(0); return; }
-    if (cur < 0 && r.top > innerHeight * 0.45) { setStep(0); return; }
-    const p = Math.min(Math.max(-r.top / range, 0), 0.9999);
-    setStep(Math.floor(p * n));
-  }
-  segs.forEach((seg, i) => {
-    const go = () => {
-      const r = sec.getBoundingClientRect();
-      const range = Math.max(r.height - innerHeight, 0);
-      const targetY = window.scrollY + r.top + (range * (i + 0.15)) / n;
-      window.scrollTo({ top: targetY, behavior: 'smooth' });
+
+  tabs.forEach((btn, i) => {
+    btn.addEventListener('click', () => {
+      paused = true;
       setStep(i);
-    };
-    seg.addEventListener('click', go);
-    seg.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+    });
   });
-  addEventListener('scroll', tick, { passive: true });
-  addEventListener('resize', tick);
-  tick();
+
+  sec.addEventListener('mouseenter', () => { paused = true; });
+  sec.addEventListener('mouseleave', () => { paused = false; });
+  sec.addEventListener('focusin', () => { paused = true; });
+
+  setStep(0);
+
+  if (!reduce) {
+    timer = setInterval(() => {
+      if (paused || document.hidden) return;
+      const r = sec.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > innerHeight) return;
+      setStep((cur + 1) % n);
+    }, 6000);
+  }
 })();

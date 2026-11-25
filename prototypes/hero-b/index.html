@@ -28,14 +28,16 @@
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: Manrope, system-ui, sans-serif; scroll-behavior: smooth; }
-  .hero { position: relative; height: 175vh; }
-  .stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+  #hero.hero { position: relative; min-height: 100svh; height: auto; padding-top: 76px; display: flex; align-items: stretch; }
+  #hero .stage { position: relative; width: 100%; min-height: calc(100svh - 76px); overflow: hidden; display: flex; align-items: center; }
   /* Холст поверх текста: осколки букв вылетают из заголовка к зрителю */
-  canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 3; pointer-events: none; }
-  .copy {
-    position: absolute; left: clamp(16px, 5vw, 72px); top: clamp(80px, 14vh, 140px);
-    max-width: min(640px, calc(100% - 32px)); pointer-events: none; z-index: 2;
+  #hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 3; pointer-events: none; }
+  #hero .copy {
+    position: relative; width: min(1240px, 100%); margin: 0 auto;
+    padding: clamp(28px, 5vh, 56px) clamp(16px, 4vw, 32px) clamp(48px, 7vh, 80px);
+    pointer-events: none; z-index: 4;
   }
+  #hero .copy > * { max-width: min(620px, 100%); }
   /* Шрифт заголовка: плотные гротески с кириллицей. Чем плотнее штрих, тем больше осколков и сочнее разлёт. */
   :root { --hf: Geologica; --hw: 800; --hs: 1; --hl: -0.035em; --hlh: 1.02; }
   .f1 { --hf: Geologica; --hw: 900; --hs: 1.04; --hl: -0.05em; --hlh: .98; }
@@ -67,16 +69,23 @@
   .cta { pointer-events: auto; display: inline-flex; align-items: center; gap: 10px; background: var(--ink); color: #fff; text-decoration: none; font-weight: 700; padding: 16px 22px; border-radius: 999px; font-size: 16px; position: relative; z-index: 4; }
   .cta:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
   .note { font-size: 13px; color: var(--muted); margin-top: 12px; }
-  .top { position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 20px clamp(16px, 5vw, 72px); z-index: 6; font-weight: 800; letter-spacing: -0.02em; }
-  .top nav { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
-  .top a { color: var(--ink); text-decoration: none; font-weight: 600; font-size: 14px; opacity: .82; transition: opacity .2s, color .2s; }
+  .top {
+    position: fixed; top: 12px; left: 50%; transform: translateX(-50%);
+    width: min(1240px, calc(100% - 24px));
+    display: flex; justify-content: space-between; align-items: center; gap: 16px;
+    padding: 10px 14px 10px 20px; z-index: 50;
+    background: rgba(255, 255, 255, .82);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(17, 17, 17, .08); border-radius: 999px;
+    box-shadow: 0 12px 32px -16px rgba(17, 19, 24, .18);
+    font-weight: 800; letter-spacing: -0.02em;
+  }
+  .top nav { display: flex; align-items: center; gap: 18px; flex-wrap: nowrap; }
+  .top a { color: var(--ink); text-decoration: none; font-weight: 600; font-size: 14px; opacity: .78; transition: opacity .2s, color .2s; white-space: nowrap; }
   .top a:hover { opacity: 1; color: var(--accent); }
-  .top a.top-cta { background: var(--accent); color: #fff; opacity: 1; padding: 8px 14px; border-radius: 999px; font-weight: 700; }
-  .phase { position: absolute; left: clamp(16px, 5vw, 72px); bottom: 28px; z-index: 6; font-size: 14px; color: var(--muted); display: flex; align-items: center; gap: 16px; }
-  .phase a { color: var(--accent); font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px; background: rgba(35, 87, 198, .08); }
-  .phase a:hover { background: rgba(35, 87, 198, .15); }
-  .phase i { font-style: normal; opacity: .45; transition: opacity .3s; }
-  .phase i.on { opacity: 1; color: var(--ink); }
+  .top a.top-cta { background: var(--accent); color: #fff; opacity: 1; padding: 9px 16px; border-radius: 999px; font-weight: 700; box-shadow: 0 6px 16px -6px rgba(35, 87, 198, .55); }
+  .top a.top-cta:hover { background: #1c47a6; color: #fff; }
+  .phase { display: none; }
   .tg {
     position: absolute; right: clamp(16px, 5vw, 72px); bottom: clamp(90px, 14vh, 140px); z-index: 4;
     width: min(360px, calc(100% - 32px)); background: var(--card); border-radius: 18px; padding: 16px 18px;
@@ -106,14 +115,15 @@
   .fsw a:focus-visible { outline: 2px solid var(--accent); }
   .after { min-height: 60vh; display: grid; place-items: center; color: var(--muted); font-size: 18px; }
   @media (max-width: 760px) {
-    .hero { height: 145vh; }
-    .top { padding: 14px 16px; }
+    #hero.hero { min-height: 92svh; padding-top: 68px; }
+    #hero .stage { min-height: calc(92svh - 68px); align-items: flex-start; }
+    .top { top: 8px; width: calc(100% - 16px); padding: 8px 10px 8px 14px; gap: 8px; }
     .top nav { gap: 10px; }
     .top nav a:not(.top-cta):not([href="#cases"]):not([href="#prices"]) { display: none; }
-    .copy { top: 76px; }
+    .top a.top-cta { padding: 8px 13px; font-size: 13px; }
+    #hero .copy { padding: 24px 16px 36px; }
     .fsw span { display: none; }
-    .tg { bottom: 80px; }
-    .phase { display: none; }
+    .tg { display: none; }
   }
 </style>
 </head>
