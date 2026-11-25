@@ -90,14 +90,20 @@ let view = { w: 10, h: 6 }, cw = 1, ch = 1;
 const swarm = new THREE.Vector3(), botPos = new THREE.Vector3(), lineDir = new THREE.Vector3();
 let wall = { x: -99, y: 99 };
 function layout() {
-  cw = canvas.clientWidth; ch = canvas.clientHeight;
+  cw = Number.isFinite(canvas.clientWidth) ? canvas.clientWidth : 0;
+  ch = Number.isFinite(canvas.clientHeight) ? canvas.clientHeight : 0;
+  if (!renderer || cw <= 0 || ch <= 0) return false;
   renderer.setSize(cw, ch, false);
-  camera.aspect = cw / ch; camera.updateProjectionMatrix();
+  const aspect = cw / ch;
+  if (!Number.isFinite(aspect) || aspect <= 0) return false;
+  camera.aspect = aspect; camera.updateProjectionMatrix();
   const vh = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z;
-  view = { w: vh * camera.aspect, h: vh };
+  if (!Number.isFinite(vh) || vh <= 0) return false;
+  view = { w: vh * aspect, h: vh };
   // плоскость теней шире кадра (она дальше камеры), камера тени накрывает весь кадр
   ground.scale.set(view.w * 1.4, view.h * 1.4, 1);
   const sc = key.shadow.camera, half = Math.max(view.w, view.h) * 0.75;
+  if (!sc || !Number.isFinite(half) || half <= 0) return false;
   sc.left = -half; sc.right = half; sc.top = half; sc.bottom = -half; sc.updateProjectionMatrix();
   if (cw < 760) {
     // Телефон: рой живёт под кнопкой Telegram и подписью к ней. Граница берётся из вёрстки,
@@ -111,9 +117,13 @@ function layout() {
     swarm.set(view.w * 0.24, -view.h * 0.04, 0); botPos.set(view.w * 0.26, view.h * 0.1, 0);
     lineDir.set(-0.35, -1, 0).normalize(); wall = { x: -view.w / 2 + view.w * 0.5, y: 99 };
   }
+  return true;
 }
 // Пиксель экрана в мир на плоскости z = 0
-const toWorld = (x, y, v = new THREE.Vector3()) => v.set((x / cw - .5) * view.w, -(y / ch - .5) * view.h, 0);
+const toWorld = (x, y, v = new THREE.Vector3()) => {
+  if (!cw || !ch || !Number.isFinite(view.w) || !Number.isFinite(view.h)) return v.set(0, 0, 0);
+  return v.set((x / cw - .5) * view.w, -(y / ch - .5) * view.h, 0);
+};
 
 // ---------- Плашки ----------
 const CH = [
@@ -377,7 +387,7 @@ addEventListener('pointerleave', () => mouse.set(999, 999, 0));
 const hero = document.getElementById('hero');
 const tg = document.getElementById('tg');
 const steps = [...document.querySelectorAll('.phase i')];
-const progress = () => { const r = hero.getBoundingClientRect(); return clamp01(-r.top / (r.height - innerHeight)); };
+const progress = () => { const r = hero.getBoundingClientRect(), range = r.height - innerHeight; return range > 0 && Number.isFinite(range) ? clamp01(-r.top / range) : 0; };
 const ss = (a, b, x) => THREE.MathUtils.smoothstep(x, a, b);
 const tmp = new THREE.Vector3(), slot = new THREE.Vector3();
 let last = performance.now(), sp = 0;

@@ -28,7 +28,6 @@
   .svc { position: relative; height: 560vh; }
   .stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
   canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 3; pointer-events: none; }
-
   .side { position: absolute; left: clamp(16px, 5vw, 72px); top: clamp(56px, 12vh, 120px); width: min(460px, 40vw); z-index: 2; }
   .side h2 { font-family: 'Dela Gothic One', system-ui, sans-serif; font-weight: 400; font-size: clamp(28px, 3.4vw, 50px); line-height: 1.05; letter-spacing: -0.02em; margin: 0 0 28px; }
   .bar { display: flex; gap: 6px; margin-bottom: 22px; }
@@ -95,7 +94,9 @@
     .side { top: 28px; width: auto; right: 16px; }
     .side h2 { font-size: 26px; margin-bottom: 14px; }
     .bar { margin-bottom: 12px; }
-    .cards { min-height: 0; height: 250px; }
+    .cards { min-height: 0; height: auto; }
+    .card { position: relative; display: none; }
+    .card.active { display: block; }
     .card h3 { font-size: 18px; margin-bottom: 6px; }
     .card p { font-size: 14px; margin-bottom: 6px; }
     .card .works { font-size: 13px; }
@@ -154,7 +155,7 @@
     </div>
 
     <!-- Экраны продукта: числа в них показательные, для макета. Координаты блоков в процентах рамки. -->
-    <div class="frame" aria-hidden="true">
+    <div class="frame" aria-live="polite" aria-label="Превью активного направления">
       <div class="scr" data-s="0">
         <div class="cap">Telegram · бот TMV</div>
         <div class="b" style="--x:6;--y:6;--w:62;--h:13"><small>Авито · 02:14</small>Сколько стоит замена экрана на iPhone 13?</div>

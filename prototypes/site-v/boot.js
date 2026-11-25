@@ -26,16 +26,22 @@ function url(extra = {}) {
 
 /* ---------- блоки из прототипов ---------- */
 async function pull(path, sel) {
-  const html = await (await fetch(path)).text();
+  const res = await fetch(path);
+  if (!res.ok) throw new Error(`HTTP ${res.status} for ${path}`);
+  const html = await res.text();
   const doc = new DOMParser().parseFromString(html, 'text/html');
   const css = [...doc.querySelectorAll('style')].map((s) => s.textContent).join('\n');
-  return { css, node: doc.querySelector(sel) };
+  const node = doc.querySelector(sel);
+  if (!node) throw new Error(`Selector ${sel} not found in ${path}`);
+  return { css, node };
 }
 function mount(host, { css, node }) {
+  if (!host || !node) return false;
   const style = document.createElement('style');
   style.textContent = css;
   host.before(style);
   host.replaceWith(document.importNode(node, true));
+  return true;
 }
 
 /* ---------- твики ---------- */
@@ -177,16 +183,27 @@ MOTION[V](main);
 
 // Первый экран: hero-b целиком. Его сцена берёт холст #c при загрузке модуля, поэтому блок услуг (тоже #c) монтируется после.
 const fallback = setTimeout(() => { if (!window.heroB) document.querySelector('.copy h1')?.classList.add('ready'); }, 3000);
-mount(document.getElementById('hero-host'), await pull('../hero-b/index.html', '#hero'));
-document.querySelector('#hero .top a')?.setAttribute('href', '#cases');
-sticky();
-try { await import('../hero-b/scene.js'); } catch (e) { console.warn('hero-b', e); document.querySelector('.copy h1')?.classList.add('ready'); }
+try {
+  mount(document.getElementById('hero-host'), await pull('../hero-b/index.html', '#hero'));
+  document.querySelector('#hero .top a')?.setAttribute('href', '#cases');
+  sticky();
+  try { await import('../hero-b/scene.js'); } catch (e) { console.warn('hero-b', e); document.querySelector('.copy h1')?.classList.add('ready'); }
+  const heroCanvas = document.querySelector('#hero canvas');
+  if (heroCanvas) heroCanvas.id = 'c-hero';
+} catch (e) {
+  console.warn('hero-b mount failed', e);
+  sticky();
+}
 clearTimeout(fallback);
-document.querySelector('#hero canvas').id = 'c-hero';
 
 const svcHost = document.getElementById('svc-host');
-if (st.b2) {
-  mount(svcHost, await pull('../services-b/index.html', '#svc'));
-  await new Promise((r) => { const s = document.createElement('script'); s.src = '../services-b/ui.js'; s.onload = r; s.onerror = r; document.body.append(s); });
-  try { await import('../services-b/scene.js'); } catch (e) { console.warn('services-b', e); }
-} else svcHost.remove();
+if (st.b2 && svcHost) {
+  try {
+    mount(svcHost, await pull('../services-b/index.html', '#svc'));
+    await new Promise((r) => { const s = document.createElement('script'); s.src = '../services-b/ui.js'; s.onload = r; s.onerror = r; document.body.append(s); });
+    try { await import('../services-b/scene.js'); } catch (e) { console.warn('services-b', e); }
+  } catch (e) {
+    console.warn('services-b mount failed', e);
+    svcHost.remove();
+  }
+} else svcHost?.remove();

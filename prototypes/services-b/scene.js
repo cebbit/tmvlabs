@@ -9,7 +9,10 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const canvas = document.getElementById('c');
 const scrs = [...document.querySelectorAll('.scr')];
-if (reduce) throw new Error('reduced motion: экраны переключаются без сборки');
+if (reduce) {
+  document.documentElement.classList.remove('gl');
+  window.servicesB = true;
+} else {
 
 // без WebGL конструктор бросит ошибку, класса gl не будет, ui.js просто проявляет блоки
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
@@ -249,3 +252,4 @@ let rz;
 addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(snap, 120); });
 if (window.svcStep >= 0) start(window.svcStep);
 window.servicesB = true;
+}
