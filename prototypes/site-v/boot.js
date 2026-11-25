@@ -4,6 +4,7 @@ import { VARIANTS } from './render.js';
 import { TG, fin } from './content.js';
 
 const q = new URLSearchParams(location.search);
+const SHOW_TWEAKS = q.get('tweaks') === '1';
 const num = (k, d, max) => Math.min(Math.max(parseInt(q.get(k) ?? d, 10) || 0, 0), max);
 const V = num('v', 0, 3);
 const ACC = [['Зелёный', '#1f8a5b'], ['Синий', '#2357c6'], ['Терракота', '#c2501d'], ['Графит', '#3a3a38']];
@@ -21,6 +22,7 @@ function applyTweaks() {
 }
 function url(extra = {}) {
   const p = new URLSearchParams({ v: V, ...st, ...extra });
+  if (SHOW_TWEAKS) p.set('tweaks', '1');
   return '?' + p.toString();
 }
 
@@ -177,8 +179,9 @@ applyTweaks();
 const main = document.getElementById('main');
 main.classList.add('v' + V);
 main.innerHTML = VARIANTS[V].render();
-document.title = `TMV Labs · вариант ${V + 1} «${VARIANTS[V].name}»`;
-tweaks(); forms();
+document.title = `TMV Labs · ${VARIANTS[V].name}`;
+if (SHOW_TWEAKS) tweaks();
+forms();
 MOTION[V](main);
 
 // Первый экран: hero-b целиком. Его сцена берёт холст #c при загрузке модуля, поэтому блок услуг (тоже #c) монтируется после.

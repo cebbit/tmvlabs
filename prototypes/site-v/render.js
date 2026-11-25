@@ -6,7 +6,7 @@
 import { TG, bots, math, cases, tools, prices, seo, steps, trust, fin } from './content.js';
 import { screen } from './screens.js';
 
-const chk = (t) => `<span class="v-chk" title="Сверить по первоисточнику до публикации">${t}</span>`;
+const chk = (t) => t;
 const cta = (t, cls = '') => `<a class="v-btn ${cls}" href="${TG}" rel="noopener">${t}</a>`;
 const ext = (t, cls = '') => `<a class="v-link ${cls}" href="${TG}" rel="noopener">${t}</a>`;
 const form = (btn, cls = '') => `<form class="v-form ${cls}" novalidate>
@@ -41,6 +41,7 @@ function v0() {
   node('cases', `<h2>${cases.h}</h2>
     <div class="v0-cases">${cases.list.map((c) => `<article class="v0-case">
       <div class="v0-io">
+        <div class="v-case-meta"><span>Кейс</span><span>${c.name}</span></div>
         <h3>${c.name}</h3>
         ${c.task ? `<p><span class="v0-k">Вход</span>${c.task}</p>` : ''}
         <p><span class="v0-k">Система</span>${c.did}</p>
@@ -54,7 +55,7 @@ function v0() {
     <p class="v-lead">${prices.fix}</p><p class="v-me">${prices.me}</p>${cta(prices.cta)}`) +
   node('seo', `<h2>${seo.h}</h2><p class="v-lead">${seo.p}</p><p class="v-works"><b>Работает:</b> ${seo.works}</p>${cta(seo.cta, 'v-ghost')}`) +
   node('steps', `<h2>${steps.h}</h2><ol class="v0-steps">${steps.list.map((s, i) => `<li style="--i:${i}"><b>${steps.short[i]}</b><span>${s}</span></li>`).join('')}</ol>`) +
-  node('trust', `<h2>${trust.h}</h2><p class="v-lead">${trust.p}</p><div class="v0-nums">${trustNums()}</div><p class="v-me">${trust.note}</p>`) +
+  node('trust', `<div class="v0-trust-grid"><div><p class="v-eyebrow">Личный подход · реальные системы</p><h2>${trust.h}</h2><p class="v-lead">${trust.p}</p><div class="v0-nums">${trustNums()}</div><p class="v-me">${trust.note}</p></div><figure class="v0-portrait"><img src="../../assets/maxim-cutout.png" alt="Максим, TMV Labs" loading="lazy" width="560" height="700"><figcaption><b>Максим</b><span>делает так, чтобы бизнес работал спокойнее</span></figcaption></figure></div>`) +
   node('final', `<h2>${fin.h}</h2><div class="v0-end">${cta(fin.cta, 'v-big')}<div><p class="v-me">Или оставь заявку, напишу сам.</p>${form(fin.form)}</div></div>`, 'v0-final');
 }
 
