@@ -1,7 +1,7 @@
 /* site-v: весь сайт под первый экран hero-b. Классы с префиксом v- и s-, чтобы не задеть стили hero-b и services-b,
    которые подгружаются из их прототипов как есть. Мир общий: светлый фон, тушь, один акцент, Dela Gothic One и Manrope. */
 :root {
-  --bg: #f5f4ef; --ink: #111; --muted: #5f5f5a; --accent: #1f8a5b; --card: #fff;
+  --bg: #f5f4ef; --ink: #111; --muted: #5f5f5a; --accent: #2357c6; --card: #fff;
   --line: rgba(17,17,17,.12); --soft: color-mix(in srgb, var(--accent) 13%, var(--bg));
   --d: 1; /* плотность: 1 просторно, .78 плотно */
   --gut: clamp(16px, 5vw, 72px); --sec: calc(clamp(88px, 12vw, 168px) * var(--d));

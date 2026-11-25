@@ -171,7 +171,7 @@ for (let i = 0; i < N; i++) {
 const bot = new THREE.Group();
 const botCore = new THREE.Mesh(new RoundedBoxGeometry(2.2, 2.2, 2.2, 6, 0.6),
   new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.22, clearcoat: 1, iridescence: 0.6, iridescenceThicknessRange: [200, 500] }));
-const ringMat = new THREE.MeshStandardMaterial({ color: 0x1f8a5b, emissive: 0x1f8a5b, emissiveIntensity: 0.6 });
+const ringMat = new THREE.MeshStandardMaterial({ color: 0x2357c6, emissive: 0x2357c6, emissiveIntensity: 0.65 });
 const ring = new THREE.Mesh(new THREE.TorusGeometry(1.9, 0.08, 16, 80), ringMat);
 const botFace = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 0.8), new THREE.MeshBasicMaterial({ map: (() => {
   const cv = document.createElement('canvas'); cv.width = 256; cv.height = 128; const g = cv.getContext('2d');

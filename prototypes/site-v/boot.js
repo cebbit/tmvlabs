@@ -10,7 +10,7 @@ const V = num('v', 0, 3);
 const ACC = [['Зелёный', '#1f8a5b'], ['Синий', '#2357c6'], ['Терракота', '#c2501d'], ['Графит', '#3a3a38']];
 const GND = [['Тёплый', '#f5f4ef'], ['Белый', '#fbfbf9'], ['Холодный', '#eef1f3']];
 const DEN = [['Просторно', 1], ['Плотно', .78]];
-const st = { a: num('a', 0, 3), g: num('g', 0, 2), d: num('d', 0, 1), b2: num('b2', 1, 1), gr: num('gr', 1, 1) };
+const st = { a: num('a', 1, 3), g: num('g', 0, 2), d: num('d', 0, 1), b2: num('b2', 1, 1), gr: num('gr', 1, 1) };
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const root = document.documentElement;
 
@@ -188,7 +188,6 @@ MOTION[V](main);
 const fallback = setTimeout(() => { if (!window.heroB) document.querySelector('.copy h1')?.classList.add('ready'); }, 3000);
 try {
   mount(document.getElementById('hero-host'), await pull('../hero-b/index.html', '#hero'));
-  document.querySelector('#hero .top a')?.setAttribute('href', '#cases');
   sticky();
   try { await import('../hero-b/scene.js'); } catch (e) { console.warn('hero-b', e); document.querySelector('.copy h1')?.classList.add('ready'); }
   const heroCanvas = document.querySelector('#hero canvas');
