@@ -1,0 +1,143 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Onest", "Manrope", system-ui, sans-serif;
+  --font-tech: "Unbounded", "Onest", sans-serif;
+  --font-sans: "Manrope", "Onest", system-ui, -apple-system, sans-serif;
+  --color-brand: #2357c6;
+  --color-brand-dark: #1944a5;
+  --color-brand-soft: #eef4ff;
+}
+
+@layer base {
+  html {
+    overflow-x: hidden;
+  }
+  body {
+    font-family: var(--font-sans);
+    overflow-x: hidden;
+    background: #ffffff;
+    color: #0f172a;
+  }
+}
+
+/* Magic UI: Orbiting Circles */
+@keyframes orbit {
+  0% {
+    transform: rotate(calc(var(--angle, 0) * 1deg)) translateY(calc(var(--radius, 120) * 1px)) rotate(calc(var(--angle, 0) * -1deg));
+  }
+  100% {
+    transform: rotate(calc(var(--angle, 0) * 1deg + 360deg)) translateY(calc(var(--radius, 120) * 1px)) rotate(calc((var(--angle, 0) * -1deg) - 360deg));
+  }
+}
+
+.animate-orbit {
+  animation: orbit var(--duration, 24s) linear infinite;
+}
+
+.animate-orbit-reverse {
+  animation: orbit var(--duration, 28s) linear infinite reverse;
+}
+
+/* Magic UI: Border Beam */
+@keyframes border-beam {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.border-beam-wrap {
+  position: relative;
+  overflow: hidden;
+}
+
+.border-beam-wrap::before {
+  content: "";
+  position: absolute;
+  inset: -120%;
+  background: conic-gradient(from 0deg, transparent 0deg, transparent 275deg, #2357c6 315deg, #60a5fa 340deg, transparent 360deg);
+  animation: border-beam 5s linear infinite;
+  z-index: 0;
+}
+
+.border-beam-inner {
+  position: relative;
+  z-index: 1;
+}
+
+/* Magic UI: Shimmer Button */
+@keyframes shimmer-slide {
+  0% { transform: translateX(-120%) skewX(-20deg); }
+  100% { transform: translateX(260%) skewX(-20deg); }
+}
+
+.shimmer-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-btn::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 45%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.34), transparent);
+  animation: shimmer-slide 3.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Magic UI: Marquee */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 32s linear infinite;
+}
+
+.marquee-shell:hover .animate-marquee {
+  animation-play-state: paused;
+}
+
+/* Subtle dot grid */
+.dot-grid {
+  background-image: radial-gradient(rgba(35, 87, 198, 0.14) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+.dot-grid-subtle {
+  background-image: radial-gradient(rgba(15, 23, 42, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Spotlight hover (Clerk style) */
+.spotlight-card {
+  position: relative;
+}
+
+.spotlight-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(300px circle at var(--mx, 50%) var(--my, 50%), rgba(35, 87, 198, 0.12), transparent 65%);
+  opacity: 0;
+  transition: opacity 0.25s;
+  pointer-events: none;
+}
+
+.spotlight-card:hover::before {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-orbit,
+  .animate-orbit-reverse,
+  .animate-marquee,
+  .border-beam-wrap::before,
+  .shimmer-btn::after {
+    animation: none !important;
+  }
+}
